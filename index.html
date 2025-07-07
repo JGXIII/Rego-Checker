@@ -1,313 +1,346 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Rego Check | Australia</title>
   <link rel="icon" href="https://i.imgur.com/tM2lY0B.png" />
   <style>
     :root {
-      --deep-blue: #002855;
-      --bright-orange: #ff7f27;
-      --light-bg: #f7f7f7;
-      --dark-text: #1a1a1a;
+      --bg: #f7f7f7;
+      --text: #1a1a1a;
+      --card: #ffffff;
+      --primary: #002855;
+      --accent: #ff7f27;
+      --secondary-bg: #e6f0ff;
     }
-    body {
-      font-family: Arial, sans-serif;
+
+    [data-theme="dark"] {
+      --bg: #0d1117;
+      --text: #f0f0f0;
+      --card: #161b22;
+      --primary: #ffffff;
+      --accent: #ff7f27;
+      --secondary-bg: #1c293a;
+    }
+
+    html, body {
       margin: 0;
       padding: 0;
-      background: var(--light-bg);
-      color: var(--dark-text);
+      height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Arial, sans-serif;
+      overflow: hidden;
     }
+
     header {
-      background-color: var(--deep-blue);
+      background-color: var(--primary);
       color: white;
-      padding: 0.8rem;
-      text-align: center;
-      box-shadow: 0 4px 8px rgb(0 40 85 / 0.3);
+      padding: 0.8rem 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
+
     header h1 {
       margin: 0;
-      font-weight: 700;
       font-size: 1.8rem;
     }
-    main {
-      max-width: 920px;
-      margin: 1rem auto;
-      background: white;
-      padding: 1.5rem;
-      border-radius: 10px;
-      box-shadow: 0 6px 16px rgb(0 40 85 / 0.15);
+
+    .theme-toggle {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: white;
+      font-size: 1rem;
       display: flex;
-      gap: 1.5rem;
-      justify-content: space-between;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .theme-toggle svg {
+      width: 20px;
+      height: 20px;
+      transition: transform 0.4s ease;
+    }
+
+    main {
+      display: flex;
+      justify-content: center;
       align-items: flex-start;
+      padding: 1rem;
+      gap: 2rem;
+      height: calc(100% - 70px);
+      box-sizing: border-box;
     }
+
     #leftPanel {
-      flex: 1 1 560px;
+      flex: 1;
+      max-width: 600px;
     }
+
     input[type="text"] {
       width: 100%;
       padding: 1rem;
-      font-size: 1.3rem;
-      border: 2px solid var(--deep-blue);
+      font-size: 1.2rem;
+      border: 2px solid var(--primary);
       border-radius: 8px;
+      background: var(--card);
+      color: var(--text);
+      font-weight: bold;
       text-transform: uppercase;
-      letter-spacing: 2.5px;
-      box-sizing: border-box;
-      font-weight: 600;
-      transition: border-color 0.3s ease;
     }
+
     input[type="text"]:focus {
       outline: none;
-      border-color: var(--bright-orange);
-      box-shadow: 0 0 6px var(--bright-orange);
+      border-color: var(--accent);
+      box-shadow: 0 0 5px var(--accent);
     }
-    ul {
-      list-style-type: none;
+
+    #result ul {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
       padding: 0;
+      list-style: none;
       margin-top: 1.5rem;
     }
-    li {
-      margin: 0.5rem 0;
-      padding: 0.85rem 1.2rem;
-      background: #dbe8ff;
-      color: var(--deep-blue);
-      font-weight: 700;
-      cursor: pointer;
+
+    #result li {
+      background: var(--secondary-bg);
+      color: var(--primary);
+      font-weight: bold;
+      padding: 0.8rem 1rem;
       border-radius: 8px;
-      user-select: none;
-      transition: background-color 0.25s ease;
-      box-shadow: inset 0 0 0 1px var(--deep-blue);
+      text-align: center;
+      cursor: pointer;
+      transition: background 0.2s;
     }
-    li:hover {
-      background-color: var(--bright-orange);
+
+    #result li:hover {
+      background: var(--accent);
       color: white;
-      box-shadow: none;
     }
+
     #recentSearches {
-      width: 240px;
-      background: #f0f5ff;
-      border: 2px solid var(--deep-blue);
+      width: 220px;
+      background: var(--card);
+      border: 2px solid var(--primary);
       border-radius: 10px;
-      padding: 1rem 1.25rem;
+      padding: 1rem;
       box-sizing: border-box;
       font-size: 0.95rem;
-      color: var(--deep-blue);
       display: flex;
       flex-direction: column;
       max-height: 100%;
     }
+
     #recentSearches h3 {
       margin-top: 0;
       margin-bottom: 0.75rem;
-      font-weight: 800;
-      font-size: 1.25rem;
-      border-bottom: 2px solid var(--bright-orange);
+      font-size: 1.2rem;
+      border-bottom: 2px solid var(--accent);
       padding-bottom: 0.4rem;
     }
+
     #recentList {
       list-style: none;
       padding: 0;
       margin: 0;
     }
+
     #recentList li {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 0.6rem;
-      padding: 0.4rem 0.7rem;
-      background: #c9ddff;
-      border-radius: 7px;
-      box-shadow: inset 0 0 0 1px var(--deep-blue);
-      font-weight: 600;
-      user-select: none;
+      background: var(--secondary-bg);
+      margin-bottom: 0.5rem;
+      padding: 0.5rem 0.7rem;
+      border-radius: 6px;
+      font-weight: bold;
     }
+
     .copyBtn {
-      background: transparent;
+      background: none;
       border: none;
       cursor: pointer;
-      color: var(--deep-blue);
-      font-weight: 700;
-      font-size: 0.95rem;
+      color: var(--primary);
+      font-weight: bold;
       display: flex;
       align-items: center;
-      gap: 6px;
-      padding: 0;
-      transition: color 0.3s ease;
+      gap: 4px;
     }
+
     .copyBtn:hover {
-      color: var(--bright-orange);
+      color: var(--accent);
     }
+
     .copyBtn svg {
-      stroke: currentColor;
+      width: 16px;
+      height: 16px;
     }
-    @media screen and (max-width: 720px) {
+
+    @media (max-width: 768px) {
       main {
         flex-direction: column;
-        max-width: 95%;
+        align-items: stretch;
+        overflow-y: auto;
       }
+
       #recentSearches {
         width: 100%;
-        margin-top: 1.5rem;
+        margin-top: 1rem;
+      }
+
+      #result ul {
+        grid-template-columns: 1fr;
       }
     }
   </style>
 </head>
 <body>
-<header>
-  <h1>Rego Check</h1>
-</header>
-<main>
-  <div id="leftPanel">
-    <p>Enter your number plate below. It’ll be copied automatically and you can open a state rego checker directly.</p>
-    <input type="text" id="regoInput" placeholder="e.g. AXH950 or AXH950 V" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" />
-    <div id="result"></div>
-  </div>
-  <aside id="recentSearches">
-    <h3>Recent Regos</h3>
-    <ul id="recentList" aria-live="polite" aria-relevant="additions"></ul>
-  </aside>
-</main>
-<script>
-  const stateLinks = {
-    VIC: "https://www.vicroads.vic.gov.au/registration/buy-sell-or-transfer-a-vehicle/check-vehicle-registration/vehicle-registration-enquiry",
-    NSW: "https://check-registration.service.nsw.gov.au/?isLoginRequired=true",
-    QLD: "https://www.service.transport.qld.gov.au/checkrego/application/VehicleSearch.xhtml?dswid=-124",
-    SA: "https://account.ezyreg.sa.gov.au/account/check-registration.htm#error=login_required&state=f766405e-5748-4874-84dd-25721daa5b10",
-    WA: "https://online.transport.wa.gov.au/webExternal/registration/",
-    TAS: "https://www.transport.tas.gov.au/MRSWebInterface/public/regoLookup/registrationLookup.xhtml",
-    ACT: "https://rego.act.gov.au/regosoawicket/public/reg/FindRegistrationPage",
-    NT: "https://nt.gov.au/driving/rego/existing-nt-registration/rego-check"
-  };
+  <header>
+    <h1>Rego Check</h1>
+    <button class="theme-toggle" id="themeToggle">
+      <span id="themeText">Dark Mode</span>
+      <svg id="themeIcon" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor"
+        stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-moon"
+        viewBox="0 0 24 24">
+        <path d="M21 12.79A9 9 0 0111.21 3 7 7 0 0012 21a9 9 0 009-8.21z" />
+      </svg>
+    </button>
+  </header>
 
-  const letterToState = {
-    V: "VIC",
-    N: "NSW",
-    Q: "QLD",
-    S: "SA",
-    W: "WA",
-    T: "TAS",
-    A: "ACT",
-    X: "NT"
-  };
+  <main>
+    <div id="leftPanel">
+      <input type="text" id="regoInput" placeholder="e.g. AXH950 or AXH950 V" />
+      <div id="result"></div>
+    </div>
+    <aside id="recentSearches">
+      <h3>Recent Regos</h3>
+      <ul id="recentList"></ul>
+    </aside>
+  </main>
 
-  const input = document.getElementById("regoInput");
-  const result = document.getElementById("result");
-  const recentList = document.getElementById("recentList");
-  let recentRegos = [];
+  <script>
+    const stateLinks = {
+      VIC: "https://www.vicroads.vic.gov.au/registration/buy-sell-or-transfer-a-vehicle/check-vehicle-registration/vehicle-registration-enquiry",
+      NSW: "https://check-registration.service.nsw.gov.au/?isLoginRequired=true",
+      QLD: "https://www.service.transport.qld.gov.au/checkrego/application/VehicleSearch.xhtml?dswid=-124",
+      SA: "https://account.ezyreg.sa.gov.au/account/check-registration.htm#error=login_required&state=f766405e-5748-4874-84dd-25721daa5b10",
+      WA: "https://online.transport.wa.gov.au/webExternal/registration/",
+      TAS: "https://www.transport.tas.gov.au/MRSWebInterface/public/regoLookup/registrationLookup.xhtml",
+      ACT: "https://rego.act.gov.au/regosoawicket/public/reg/FindRegistrationPage",
+      NT: "https://nt.gov.au/driving/rego/existing-nt-registration/rego-check"
+    };
 
-  function openAndFocus(url) {
-    const newWindow = window.open(url, "_blank");
-    if (newWindow) newWindow.focus();
-  }
+    const letterToState = {
+      V: "VIC", N: "NSW", Q: "QLD", S: "SA",
+      W: "WA", T: "TAS", A: "ACT", X: "NT"
+    };
 
-  function buildStateList(rego) {
-    if (!rego || rego.length < 2) {
-      result.innerHTML = "";
-      return;
+    const input = document.getElementById("regoInput");
+    const result = document.getElementById("result");
+    const recentList = document.getElementById("recentList");
+    let recentRegos = [];
+
+    function addRecentRego(rego) {
+      rego = rego.toUpperCase();
+      if (!rego) return;
+      recentRegos = recentRegos.filter(r => r !== rego);
+      recentRegos.unshift(rego);
+      if (recentRegos.length > 13) recentRegos.pop();
+      renderRecentList();
     }
-    let html = '<h3>Click a state below to check your rego:</h3><ul>';
-    for (const [state, url] of Object.entries(stateLinks)) {
-      html += `<li onclick="onStateClick('${state}', '${rego.replace(/'/g, "\\'")}')">${state} Rego Check</li>`;
-    }
-    html += '</ul>';
-    result.innerHTML = html;
-  }
 
-  function onStateClick(state, rego) {
-    const url = stateLinks[state];
-    if (url) {
-      openAndFocus(url);
-      addRecentRego(rego.toUpperCase());
-      input.value = "";
-      result.innerHTML = "";
-    }
-  }
+    function renderRecentList() {
+      recentList.innerHTML = "";
+      recentRegos.forEach(rego => {
+        const li = document.createElement("li");
+        li.textContent = rego;
 
-  function addRecentRego(rego) {
-    rego = rego.toUpperCase();
-    recentRegos = recentRegos.filter(r => r !== rego);
-    recentRegos.unshift(rego);
-    if (recentRegos.length > 13) recentRegos.pop();
-    renderRecentList();
-  }
+        const btn = document.createElement("button");
+        btn.className = "copyBtn";
+        btn.title = `Copy ${rego}`;
+        btn.innerHTML = `
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor"
+            stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+            class="feather feather-copy" viewBox="0 0 24 24">
+            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+          </svg> Copy`;
 
-  function renderRecentList() {
-    recentList.innerHTML = "";
-    recentRegos.forEach(rego => {
-      const li = document.createElement("li");
-      li.textContent = rego;
+        btn.onclick = () => {
+          navigator.clipboard.writeText(rego);
+          btn.innerHTML = "Copied!";
+          setTimeout(renderRecentList, 1500);
+        };
 
-      const btn = document.createElement("button");
-      btn.className = "copyBtn";
-      btn.title = `Copy ${rego}`;
-      btn.innerHTML = `
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none"
-          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-          viewBox="0 0 24 24">
-          <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-        </svg>
-        Copy
-      `;
-      btn.addEventListener("click", e => {
-        e.stopPropagation();
-        navigator.clipboard.writeText(rego).then(() => {
-          btn.textContent = "Copied!";
-          setTimeout(() => {
-            btn.innerHTML = `
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none"
-                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                viewBox="0 0 24 24">
-                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-              </svg>
-              Copy
-            `;
-          }, 1500);
-        });
+        li.appendChild(btn);
+        recentList.appendChild(li);
       });
-
-      li.appendChild(btn);
-      recentList.appendChild(li);
-    });
-  }
-
-  input.addEventListener("input", () => {
-    let val = input.value.trim().toUpperCase();
-
-    let regoOnly = val;
-    let lastSpaceIndex = val.lastIndexOf(" ");
-    let possibleLetter = "";
-    if (lastSpaceIndex > -1) {
-      possibleLetter = val.slice(lastSpaceIndex + 1);
-      if (possibleLetter.length === 1 && letterToState[possibleLetter]) {
-        regoOnly = val.slice(0, lastSpaceIndex);
-      }
     }
 
-    if (!regoOnly || regoOnly.length < 2) {
-      result.innerHTML = "";
-      return;
+    function buildStateList(rego) {
+      let html = "<ul>";
+      Object.entries(stateLinks).forEach(([state, url]) => {
+        html += `<li onclick="window.open('${url}', '_blank'); addRecentRego('${rego}'); input.value=''; result.innerHTML='';">${state}</li>`;
+      });
+      html += "</ul>";
+      result.innerHTML = html;
     }
 
-    navigator.clipboard.writeText(regoOnly).catch(() => {});
+    input.addEventListener("input", () => {
+      let val = input.value.trim().toUpperCase();
+      let parts = val.split(" ");
+      let rego = parts[0];
+      let code = parts[1] ? parts[1].toUpperCase() : "";
 
-    if (possibleLetter && letterToState[possibleLetter]) {
-      const state = letterToState[possibleLetter];
-      const url = stateLinks[state];
-      if (url) {
-        openAndFocus(url);
-        addRecentRego(regoOnly);
-        input.value = "";
+      if (!rego || rego.length < 2) {
         result.innerHTML = "";
         return;
       }
+
+      navigator.clipboard.writeText(rego);
+
+      if (letterToState[code]) {
+        window.open(stateLinks[letterToState[code]], "_blank");
+        addRecentRego(rego);
+        input.value = "";
+        result.innerHTML = "";
+      } else {
+        buildStateList(rego);
+      }
+    });
+
+    // Dark mode toggle logic
+    const themeToggle = document.getElementById("themeToggle");
+    const themeIcon = document.getElementById("themeIcon");
+    const themeText = document.getElementById("themeText");
+
+    function applyTheme(theme) {
+      document.documentElement.setAttribute("data-theme", theme);
+      localStorage.setItem("theme", theme);
+      themeText.textContent = theme === "dark" ? "Light Mode" : "Dark Mode";
+      themeIcon.innerHTML = theme === "dark"
+        ? '<circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>'
+        : '<path d="M21 12.79A9 9 0 0111.21 3 7 7 0 0012 21a9 9 0 009-8.21z" />';
     }
 
-    buildStateList(regoOnly);
-  });
-</script>
+    themeToggle.onclick = () => {
+      const current = document.documentElement.getAttribute("data-theme");
+      applyTheme(current === "dark" ? "light" : "dark");
+    };
+
+    const savedTheme = localStorage.getItem("theme");
+    if (savedTheme) {
+      applyTheme(savedTheme);
+    } else if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+      applyTheme("dark");
+    } else {
+      applyTheme("light");
+    }
+  </script>
 </body>
 </html>
