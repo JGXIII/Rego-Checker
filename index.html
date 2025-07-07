@@ -1,18 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Smart Rego Checker | Australia</title>
-  <link rel="icon" type="image/png" href="https://i.imgur.com/tM2lY0B.png" />
-
+  <link rel="icon" href="https://i.imgur.com/tM2lY0B.png">
   <style>
     body {
-      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      font-family: Arial, sans-serif;
       margin: 0;
       padding: 0;
       background: #f0f2f5;
-      color: #212529;
     }
 
     header {
@@ -22,144 +20,127 @@
       text-align: center;
     }
 
-    header img {
-      height: 40px;
-      vertical-align: middle;
-      margin-right: 10px;
-    }
-
     main {
       max-width: 600px;
       margin: 2rem auto;
-      padding: 1rem;
       background: white;
+      padding: 2rem;
       border-radius: 8px;
-      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+      box-shadow: 0 0 12px rgba(0,0,0,0.1);
     }
 
-    input {
+    input[type="text"] {
       width: 100%;
+      padding: 1rem;
       font-size: 1.2rem;
-      padding: 0.75rem;
-      margin: 1rem 0;
-      border-radius: 6px;
       border: 1px solid #ccc;
+      border-radius: 6px;
     }
 
     ul {
-      list-style: none;
+      list-style-type: none;
       padding: 0;
-      margin: 0;
+      margin-top: 1.5rem;
     }
 
     li {
-      margin: 0.75rem 0;
-      display: flex;
-      align-items: center;
-    }
-
-    li img {
-      width: 28px;
-      height: 28px;
-      margin-right: 10px;
-    }
-
-    a {
-      color: #007bff;
+      margin: 0.5rem 0;
+      padding: 0.75rem 1rem;
+      background: #e9f2ff;
+      color: #0052cc;
       font-weight: bold;
-      text-decoration: none;
-      font-size: 1.05rem;
+      cursor: pointer;
+      border-radius: 6px;
     }
 
-    a:hover {
-      text-decoration: underline;
+    li:hover {
+      background-color: #d0e4ff;
     }
 
-    @media (max-width: 600px) {
+    #previewPanel {
+      display: none;
+      background: #f9f9f9;
+      border-left: 4px solid #007bff;
+      margin-top: 1.5rem;
+      padding: 1rem;
+      border-radius: 6px;
+    }
+
+    #previewPanel button {
+      margin-top: 1rem;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      padding: 0.75rem 1.25rem;
+      font-size: 1rem;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    @media screen and (max-width: 600px) {
       main {
         margin: 1rem;
-      }
-
-      li img {
-        width: 24px;
-        height: 24px;
+        padding: 1.5rem;
       }
     }
   </style>
 </head>
 <body>
-
   <header>
-    <img src="https://i.imgur.com/tM2lY0B.png" alt="logo" />
-    <strong>Smart Rego Checker – Australia</strong>
+    <h1>Smart Rego Checker – Australia</h1>
   </header>
-
   <main>
-    <p>Enter your number plate below. We'll copy it for you automatically and let you choose your state to check registration info.</p>
-
-    <input type="text" id="regoInput" placeholder="e.g. AXH950" />
+    <p>Enter your number plate below. We'll copy it automatically and let you choose your state to check it.</p>
+    <input type="text" id="regoInput" placeholder="e.g. AXH950">
     <div id="result"></div>
+    <div id="previewPanel"></div>
   </main>
-
   <script>
     const stateLinks = {
-      NSW: {
-        url: "https://check-registration.service.nsw.gov.au/?isLoginRequired=true",
-        icon: "https://img.icons8.com/color/48/000000/new-south-wales.png"
-      },
-      VIC: {
-        url: "https://www.vicroads.vic.gov.au/registration/buy-sell-or-transfer-a-vehicle/check-vehicle-registration/vehicle-registration-enquiry",
-        icon: "https://img.icons8.com/color/48/000000/victoria.png"
-      },
-      QLD: {
-        url: "https://www.service.transport.qld.gov.au/checkrego/application/VehicleSearch.xhtml?dswid=-124",
-        icon: "https://img.icons8.com/color/48/000000/queensland.png"
-      },
-      SA: {
-        url: "https://account.ezyreg.sa.gov.au/account/check-registration.htm#error=login_required&state=f766405e-5748-4874-84dd-25721daa5b10",
-        icon: "https://img.icons8.com/color/48/000000/south-australia.png"
-      },
-      WA: {
-        url: "https://online.transport.wa.gov.au/webExternal/registration/",
-        icon: "https://img.icons8.com/color/48/000000/western-australia.png"
-      },
-      TAS: {
-        url: "https://www.transport.tas.gov.au/MRSWebInterface/public/regoLookup/registrationLookup.xhtml",
-        icon: "https://img.icons8.com/color/48/000000/tasmania.png"
-      },
-      ACT: {
-        url: "https://rego.act.gov.au/regosoawicket/public/reg/FindRegistrationPage",
-        icon: "https://img.icons8.com/color/48/000000/australian-capital-territory.png"
-      },
-      NT: {
-        url: "https://nt.gov.au/driving/rego/existing-nt-registration/rego-check",
-        icon: "https://img.icons8.com/color/48/000000/northern-territory.png"
-      }
+      VIC: "https://www.vicroads.vic.gov.au/registration/buy-sell-or-transfer-a-vehicle/check-vehicle-registration/vehicle-registration-enquiry",
+      NSW: "https://check-registration.service.nsw.gov.au/?isLoginRequired=true",
+      QLD: "https://www.service.transport.qld.gov.au/checkrego/application/VehicleSearch.xhtml?dswid=-124",
+      SA: "https://account.ezyreg.sa.gov.au/account/check-registration.htm#error=login_required&state=f766405e-5748-4874-84dd-25721daa5b10",
+      WA: "https://online.transport.wa.gov.au/webExternal/registration/",
+      TAS: "https://www.transport.tas.gov.au/MRSWebInterface/public/regoLookup/registrationLookup.xhtml",
+      ACT: "https://rego.act.gov.au/regosoawicket/public/reg/FindRegistrationPage",
+      NT: "https://nt.gov.au/driving/rego/existing-nt-registration/rego-check"
     };
 
-    const input = document.getElementById('regoInput');
-    const result = document.getElementById('result');
+    const input = document.getElementById("regoInput");
+    const result = document.getElementById("result");
+    const preview = document.getElementById("previewPanel");
 
-    input.addEventListener('input', updateLinks);
-
-    function updateLinks() {
+    input.addEventListener("input", () => {
       const rego = input.value.trim().toUpperCase();
       if (!rego || rego.length < 2) {
         result.innerHTML = "";
+        preview.style.display = "none";
         return;
       }
 
-      // Try to copy rego silently
       navigator.clipboard.writeText(rego).catch(() => {
-        console.warn("Clipboard write failed — browser restrictions.");
+        console.warn("Clipboard copy failed.");
       });
 
-      let html = "<h3>Select your state to check rego:</h3><ul>";
-      for (const [state, data] of Object.entries(stateLinks)) {
-        html += `<li><img src="${data.icon}" alt="${state} icon" /> <a href="${data.url}" target="_blank">${state} Rego Check</a></li>`;
+      let html = '<h3>Detected States:</h3><ul>';
+      for (const state of Object.keys(stateLinks)) {
+        html += `<li onclick="showPreview('${state}')">${state} Rego Check</li>`;
       }
-      html += "</ul>";
+      html += '</ul>';
       result.innerHTML = html;
+      preview.style.display = "none";
+    });
+
+    function showPreview(state) {
+      const rego = document.getElementById("regoInput").value.trim().toUpperCase();
+      const link = stateLinks[state];
+      preview.style.display = "block";
+      preview.innerHTML = `
+        <strong>${state} Registration Preview</strong>
+        <p>Your rego <code>${rego}</code> is ready to be searched on the official ${state} website.</p>
+        <button onclick="window.open('${link}', '_blank')">Continue to ${state} Site</button>
+      `;
     }
   </script>
 </body>
