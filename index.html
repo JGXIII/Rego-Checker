@@ -222,6 +222,7 @@
     }
   }
 
+  // Updated buildStateList: attach onclick to call onStateClick
   function buildStateList(rego) {
     if (!rego || rego.length < 2) {
       result.innerHTML = "";
@@ -229,10 +230,21 @@
     }
     let html = '<h3>Click a state below to check your rego:</h3><ul>';
     for (const [state, url] of Object.entries(stateLinks)) {
-      html += `<li onclick="openAndFocus('${url}')">${state} Rego Check</li>`;
+      html += `<li onclick="onStateClick('${state}', '${rego.replace(/'/g, "\\'")}')">${state} Rego Check</li>`;
     }
     html += '</ul>';
     result.innerHTML = html;
+  }
+
+  // New global function to handle state click from list
+  function onStateClick(state, rego) {
+    const url = stateLinks[state];
+    if (url) {
+      openAndFocus(url);
+      addRecentRego(rego.toUpperCase());
+      input.value = "";
+      result.innerHTML = "";
+    }
   }
 
   function addRecentRego(rego) {
