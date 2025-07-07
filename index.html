@@ -1,3 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Smart Rego Checker | Australia</title>
+<link rel="icon" href="https://i.imgur.com/tM2lY0B.png" />
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0; padding: 0;
+    background: #f0f2f5;
+  }
+  header {
+    background-color: #0052cc;
+    color: white;
+    padding: 1rem;
+    text-align: center;
+  }
+  main {
+    max-width: 800px;
+    margin: 2rem auto;
+    background: white;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 0 12px rgba(0,0,0,0.1);
+    display: flex;
+    gap: 2rem;
+    justify-content: center;
+  }
+  /* Left side: input + state list */
+  #leftPanel {
+    flex: 1 1 400px;
+    max-width: 420px;
+  }
+  input[type="text"] {
+    width: 100%;
+    padding: 1rem;
+    font-size: 1.2rem;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    box-sizing: border-box;
+  }
+  ul {
+    list-style-type: none;
+    padding: 0;
+    margin-top: 1.5rem;
+  }
+  li {
+    margin: 0.5rem 0;
+    padding: 0.75rem 1rem;
+    background: #e9f2ff;
+    color: #0052cc;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 6px;
+    user-select: none;
+    transition: background-color 0.2s ease;
+  }
+  li:hover {
+    background-color: #d0e4ff;
+  }
+  /* Right side: recent searches */
+  #recentSearches {
+    width: 200px;
+    background: #f9fafc;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 1rem;
+    box-sizing: border-box;
+    font-size: 0.9rem;
+    color: #333;
+  }
+  #recentSearches h3 {
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+    font-weight: bold;
+    font-size: 1.1rem;
+    color: #0052cc;
+  }
+  #recentList {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  #recentList li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+    padding: 0.25rem 0.5rem;
+    background: #e9f2ff;
+    border-radius: 5px;
+  }
+  #recentList li:last-child {
+    margin-bottom: 0;
+  }
+  .copyBtn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: #0052cc;
+    font-weight: bold;
+    font-size: 1rem;
+    user-select: none;
+  }
+  .copyBtn:hover {
+    color: #003d99;
+  }
+
+  @media screen and (max-width: 720px) {
+    main {
+      flex-direction: column;
+      max-width: 95%;
+    }
+    #recentSearches {
+      width: 100%;
+      margin-top: 1.5rem;
+    }
+    #leftPanel {
+      max-width: none;
+    }
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>Smart Rego Checker – Australia</h1>
+</header>
+<main>
+  <div id="leftPanel">
+    <p>Enter your number plate below. It’ll be copied automatically and you can open a state rego checker directly.</p>
+    <input type="text" id="regoInput" placeholder="e.g. AXH950 or AXH950 V" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" />
+    <div id="result"></div>
+  </div>
+  <aside id="recentSearches">
+    <h3>Recent Regos</h3>
+    <ul id="recentList" aria-live="polite" aria-relevant="additions"></ul>
+  </aside>
+</main>
+
 <script>
   const stateLinks = {
     VIC: "https://www.vicroads.vic.gov.au/registration/buy-sell-or-transfer-a-vehicle/check-vehicle-registration/vehicle-registration-enquiry",
@@ -23,6 +166,10 @@
 
   const input = document.getElementById("regoInput");
   const result = document.getElementById("result");
+  const recentList = document.getElementById("recentList");
+
+  // Store last 5 regos searched
+  let recentRegos = [];
 
   function openAndFocus(url) {
     const newWindow = window.open(url, "_blank");
@@ -38,11 +185,44 @@
     }
     let html = '<h3>Click a state below to check your rego:</h3><ul>';
     for (const [state, url] of Object.entries(stateLinks)) {
-      // Wrap in a function to open and focus on click
       html += `<li onclick="openAndFocus('${url}')">${state} Rego Check</li>`;
     }
     html += '</ul>';
     result.innerHTML = html;
+  }
+
+  function addRecentRego(rego) {
+    rego = rego.toUpperCase();
+    // Avoid duplicates
+    recentRegos = recentRegos.filter(r => r !== rego);
+    recentRegos.unshift(rego);
+    if (recentRegos.length > 5) {
+      recentRegos.pop();
+    }
+    renderRecentList();
+  }
+
+  function renderRecentList() {
+    recentList.innerHTML = "";
+    recentRegos.forEach(rego => {
+      const li = document.createElement("li");
+      li.textContent = rego;
+
+      const btn = document.createElement("button");
+      btn.className = "copyBtn";
+      btn.title = `Copy ${rego}`;
+      btn.innerHTML = "📋";
+      btn.addEventListener("click", e => {
+        e.stopPropagation();
+        navigator.clipboard.writeText(rego).then(() => {
+          btn.textContent = "✅";
+          setTimeout(() => btn.textContent = "📋", 1000);
+        });
+      });
+
+      li.appendChild(btn);
+      recentList.appendChild(li);
+    });
   }
 
   input.addEventListener("input", () => {
@@ -70,6 +250,7 @@
       const url = stateLinks[state];
       if (url) {
         openAndFocus(url);
+        addRecentRego(regoOnly);
         input.value = "";
         result.innerHTML = "";
         return;
@@ -79,3 +260,5 @@
     buildStateList(regoOnly);
   });
 </script>
+</body>
+</html>
