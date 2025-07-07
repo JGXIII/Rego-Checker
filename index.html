@@ -1,78 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Smart Rego Checker | Australia</title>
-<link rel="icon" href="https://i.imgur.com/tM2lY0B.png" />
-<style>
-  body {
-    font-family: Arial, sans-serif;
-    margin: 0; padding: 0;
-    background: #f0f2f5;
-  }
-  header {
-    background-color: #0052cc;
-    color: white;
-    padding: 1rem;
-    text-align: center;
-  }
-  main {
-    max-width: 600px;
-    margin: 2rem auto;
-    background: white;
-    padding: 2rem;
-    border-radius: 8px;
-    box-shadow: 0 0 12px rgba(0,0,0,0.1);
-  }
-  input[type="text"] {
-    width: 100%;
-    padding: 1rem;
-    font-size: 1.2rem;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-  }
-  ul {
-    list-style-type: none;
-    padding: 0;
-    margin-top: 1.5rem;
-  }
-  li {
-    margin: 0.5rem 0;
-    padding: 0.75rem 1rem;
-    background: #e9f2ff;
-    color: #0052cc;
-    font-weight: bold;
-    cursor: pointer;
-    border-radius: 6px;
-    user-select: none;
-    transition: background-color 0.2s ease;
-  }
-  li:hover {
-    background-color: #d0e4ff;
-  }
-  @media screen and (max-width: 600px) {
-    main {
-      margin: 1rem;
-      padding: 1.5rem;
-    }
-  }
-</style>
-</head>
-<body>
-<header>
-  <h1>Smart Rego Checker – Australia</h1>
-</header>
-<main>
-  <p>Enter your number plate below. It’ll be copied automatically and you can open a state rego checker directly.</p>
-  <input type="text" id="regoInput" placeholder="e.g. AXH950 or AXH950 V" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" />
-  <div id="result"></div>
-</main>
-
 <script>
-  // Official base URLs
   const stateLinks = {
     VIC: "https://www.vicroads.vic.gov.au/registration/buy-sell-or-transfer-a-vehicle/check-vehicle-registration/vehicle-registration-enquiry",
     NSW: "https://check-registration.service.nsw.gov.au/?isLoginRequired=true",
@@ -84,7 +10,6 @@
     NT: "https://nt.gov.au/driving/rego/existing-nt-registration/rego-check"
   };
 
-  // Map single-letter codes to states (X = NT)
   const letterToState = {
     V: "VIC",
     N: "NSW",
@@ -99,6 +24,13 @@
   const input = document.getElementById("regoInput");
   const result = document.getElementById("result");
 
+  function openAndFocus(url) {
+    const newWindow = window.open(url, "_blank");
+    if (newWindow) {
+      newWindow.focus();
+    }
+  }
+
   function buildStateList(rego) {
     if (!rego || rego.length < 2) {
       result.innerHTML = "";
@@ -106,7 +38,8 @@
     }
     let html = '<h3>Click a state below to check your rego:</h3><ul>';
     for (const [state, url] of Object.entries(stateLinks)) {
-      html += `<li onclick="window.open('${url}', '_blank')">${state} Rego Check</li>`;
+      // Wrap in a function to open and focus on click
+      html += `<li onclick="openAndFocus('${url}')">${state} Rego Check</li>`;
     }
     html += '</ul>';
     result.innerHTML = html;
@@ -115,7 +48,6 @@
   input.addEventListener("input", () => {
     let val = input.value.trim().toUpperCase();
 
-    // Copy rego portion silently, ignoring trailing state letter if present
     let regoOnly = val;
     let lastSpaceIndex = val.lastIndexOf(" ");
     let possibleLetter = "";
@@ -133,21 +65,17 @@
 
     navigator.clipboard.writeText(regoOnly).catch(() => {});
 
-    // If input matches the pattern "REGO [state letter]" then open immediately
     if (possibleLetter && letterToState[possibleLetter]) {
       const state = letterToState[possibleLetter];
       const url = stateLinks[state];
       if (url) {
-        window.open(url, "_blank");
+        openAndFocus(url);
         input.value = "";
         result.innerHTML = "";
         return;
       }
     }
 
-    // Otherwise show the state list for manual click
     buildStateList(regoOnly);
   });
 </script>
-</body>
-</html>
