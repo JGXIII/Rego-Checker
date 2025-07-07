@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>AU Rego Checker</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 2rem; }
+    input, button { font-size: 1.2rem; padding: 0.5rem; margin-top: 1rem; width: 100%; }
+  </style>
+</head>
+<body>
+  <h1>Vehicle Registration Checker (AU)</h1>
+  <p>Enter the number plate below. We'll link you to the correct state's rego checker.</p>
+
+  <input type="text" id="regoInput" placeholder="e.g. ABC123">
+  <button onclick="checkRego()">Check Registration</button>
+
+  <div id="result" style="margin-top: 2rem;"></div>
+
+  <script>
+    const stateLinks = {
+      NSW: "https://www.service.nsw.gov.au/transaction/check-vehicle-registration",
+      VIC: "https://www.vicroads.vic.gov.au/registration/registration-enquiry",
+      QLD: "https://www.qld.gov.au/transport/registration/check",
+      SA: "https://www.sa.gov.au/topics/driving-and-transport/registration/rego-check",
+      WA: "https://www.transport.wa.gov.au/licensing/check-my-vehicle-registration.asp",
+      TAS: "https://www.transport.tas.gov.au/MRSWebInterface/public/regoLookup/registrationLookup.xhtml",
+      ACT: "https://www.accesscanberra.act.gov.au/app/answers/detail/a_id/1804/~/rego-check-online",
+      NT: "https://nt.gov.au/driving/rego/check,-renew-or-transfer-registration/check-registration"
+    };
+
+    function checkRego() {
+      const input = document.getElementById('regoInput').value.trim().toUpperCase();
+      const result = document.getElementById('result');
+      result.innerHTML = "";
+
+      if (!input || input.length < 3) {
+        result.innerHTML = "<p>Please enter a valid registration number.</p>";
+        return;
+      }
+
+      let message = "<p>Choose your state or territory:</p><ul>";
+      for (const [state, link] of Object.entries(stateLinks)) {
+        message += `<li><a href="${link}" target="_blank">${state} Rego Check</a></li>`;
+      }
+      message += "</ul>";
+      result.innerHTML = message;
+    }
+  </script>
+</body>
+</html>
