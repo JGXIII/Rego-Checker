@@ -3,96 +3,130 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Smart Rego Checker | Australia</title>
+<title>Rego Check | Australia</title>
 <link rel="icon" href="https://i.imgur.com/tM2lY0B.png" />
 <style>
+  /* Colors from eastlink.com.au */
+  :root {
+    --deep-blue: #002855;
+    --bright-orange: #ff7f27;
+    --light-bg: #f7f7f7;
+    --dark-text: #1a1a1a;
+  }
   body {
     font-family: Arial, sans-serif;
     margin: 0; padding: 0;
-    background: #f0f2f5;
+    background: var(--light-bg);
+    color: var(--dark-text);
   }
   header {
-    background-color: #0052cc;
+    background-color: var(--deep-blue);
     color: white;
     padding: 1rem;
     text-align: center;
+    box-shadow: 0 4px 8px rgb(0 40 85 / 0.3);
+  }
+  header h1 {
+    margin: 0;
+    font-weight: 700;
+    font-size: 1.8rem;
   }
   main {
-    max-width: 800px;
+    max-width: 880px;
     margin: 2rem auto;
     background: white;
     padding: 2rem;
-    border-radius: 8px;
-    box-shadow: 0 0 12px rgba(0,0,0,0.1);
+    border-radius: 10px;
+    box-shadow: 0 6px 16px rgb(0 40 85 / 0.15);
     display: flex;
     gap: 2rem;
     justify-content: center;
+    min-height: 560px; /* roughly matching recent and states list height */
   }
   /* Left side: input + state list */
   #leftPanel {
-    flex: 1 1 400px;
+    flex: 1 1 420px;
     max-width: 420px;
   }
   input[type="text"] {
     width: 100%;
     padding: 1rem;
-    font-size: 1.2rem;
-    border: 1px solid #ccc;
-    border-radius: 6px;
+    font-size: 1.3rem;
+    border: 2px solid var(--deep-blue);
+    border-radius: 8px;
     text-transform: uppercase;
-    letter-spacing: 2px;
+    letter-spacing: 2.5px;
     box-sizing: border-box;
+    font-weight: 600;
+    transition: border-color 0.3s ease;
+  }
+  input[type="text"]:focus {
+    outline: none;
+    border-color: var(--bright-orange);
+    box-shadow: 0 0 6px var(--bright-orange);
   }
   ul {
     list-style-type: none;
     padding: 0;
-    margin-top: 1.5rem;
+    margin-top: 1.75rem;
   }
   li {
-    margin: 0.5rem 0;
-    padding: 0.75rem 1rem;
-    background: #e9f2ff;
-    color: #0052cc;
-    font-weight: bold;
+    margin: 0.6rem 0;
+    padding: 0.85rem 1.2rem;
+    background: #dbe8ff;
+    color: var(--deep-blue);
+    font-weight: 700;
     cursor: pointer;
-    border-radius: 6px;
+    border-radius: 8px;
     user-select: none;
-    transition: background-color 0.2s ease;
+    transition: background-color 0.25s ease;
+    box-shadow: inset 0 0 0 1px var(--deep-blue);
   }
   li:hover {
-    background-color: #d0e4ff;
+    background-color: var(--bright-orange);
+    color: white;
+    box-shadow: none;
   }
   /* Right side: recent searches */
   #recentSearches {
-    width: 200px;
-    background: #f9fafc;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    padding: 1rem;
+    width: 240px;
+    background: #f0f5ff;
+    border: 2px solid var(--deep-blue);
+    border-radius: 10px;
+    padding: 1rem 1.25rem;
     box-sizing: border-box;
-    font-size: 0.9rem;
-    color: #333;
+    font-size: 0.95rem;
+    color: var(--deep-blue);
+    display: flex;
+    flex-direction: column;
+    max-height: 100%;
+    overflow-y: auto;
   }
   #recentSearches h3 {
     margin-top: 0;
-    margin-bottom: 0.5rem;
-    font-weight: bold;
-    font-size: 1.1rem;
-    color: #0052cc;
+    margin-bottom: 0.75rem;
+    font-weight: 800;
+    font-size: 1.25rem;
+    border-bottom: 2px solid var(--bright-orange);
+    padding-bottom: 0.4rem;
   }
   #recentList {
     list-style: none;
     padding: 0;
     margin: 0;
+    flex-grow: 1;
   }
   #recentList li {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 0.5rem;
-    padding: 0.25rem 0.5rem;
-    background: #e9f2ff;
-    border-radius: 5px;
+    margin-bottom: 0.6rem;
+    padding: 0.4rem 0.7rem;
+    background: #c9ddff;
+    border-radius: 7px;
+    box-shadow: inset 0 0 0 1px var(--deep-blue);
+    font-weight: 600;
+    user-select: none;
   }
   #recentList li:last-child {
     margin-bottom: 0;
@@ -101,17 +135,18 @@
     background: transparent;
     border: none;
     cursor: pointer;
-    color: #0052cc;
-    font-weight: 600;
-    font-size: 0.9rem;
+    color: var(--deep-blue);
+    font-weight: 700;
+    font-size: 0.95rem;
     user-select: none;
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 6px;
     padding: 0;
+    transition: color 0.3s ease;
   }
   .copyBtn:hover {
-    color: #003d99;
+    color: var(--bright-orange);
   }
   /* SVG icon styling */
   .copyBtn svg {
@@ -121,10 +156,12 @@
     main {
       flex-direction: column;
       max-width: 95%;
+      min-height: auto;
     }
     #recentSearches {
       width: 100%;
       margin-top: 1.5rem;
+      max-height: 280px;
     }
     #leftPanel {
       max-width: none;
@@ -134,7 +171,7 @@
 </head>
 <body>
 <header>
-  <h1>Smart Rego Checker – Australia</h1>
+  <h1>Rego Check</h1>
 </header>
 <main>
   <div id="leftPanel">
@@ -175,7 +212,7 @@
   const result = document.getElementById("result");
   const recentList = document.getElementById("recentList");
 
-  // Store last 5 regos searched
+  // Store last 18 regos searched
   let recentRegos = [];
 
   function openAndFocus(url) {
@@ -203,7 +240,7 @@
     // Avoid duplicates
     recentRegos = recentRegos.filter(r => r !== rego);
     recentRegos.unshift(rego);
-    if (recentRegos.length > 5) {
+    if (recentRegos.length > 18) {
       recentRegos.pop();
     }
     renderRecentList();
