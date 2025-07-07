@@ -1,173 +1,158 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Rego Check | Australia</title>
-<link rel="icon" href="https://i.imgur.com/tM2lY0B.png" />
-<style>
-  /* Colors from eastlink.com.au */
-  :root {
-    --deep-blue: #002855;
-    --bright-orange: #ff7f27;
-    --light-bg: #f7f7f7;
-    --dark-text: #1a1a1a;
-  }
-  body {
-    font-family: Arial, sans-serif;
-    margin: 0; padding: 0;
-    background: var(--light-bg);
-    color: var(--dark-text);
-  }
-  header {
-    background-color: var(--deep-blue);
-    color: white;
-    padding: 1rem;
-    text-align: center;
-    box-shadow: 0 4px 8px rgb(0 40 85 / 0.3);
-  }
-  header h1 {
-    margin: 0;
-    font-weight: 700;
-    font-size: 1.8rem;
-  }
-  main {
-    max-width: 880px;
-    margin: 2rem auto;
-    background: white;
-    padding: 2rem;
-    border-radius: 10px;
-    box-shadow: 0 6px 16px rgb(0 40 85 / 0.15);
-    display: flex;
-    gap: 2rem;
-    justify-content: center;
-    min-height: 560px; /* roughly matching recent and states list height */
-  }
-  /* Left side: input + state list */
-  #leftPanel {
-    flex: 1 1 420px;
-    max-width: 420px;
-  }
-  input[type="text"] {
-    width: 100%;
-    padding: 1rem;
-    font-size: 1.3rem;
-    border: 2px solid var(--deep-blue);
-    border-radius: 8px;
-    text-transform: uppercase;
-    letter-spacing: 2.5px;
-    box-sizing: border-box;
-    font-weight: 600;
-    transition: border-color 0.3s ease;
-  }
-  input[type="text"]:focus {
-    outline: none;
-    border-color: var(--bright-orange);
-    box-shadow: 0 0 6px var(--bright-orange);
-  }
-  ul {
-    list-style-type: none;
-    padding: 0;
-    margin-top: 1.75rem;
-  }
-  li {
-    margin: 0.6rem 0;
-    padding: 0.85rem 1.2rem;
-    background: #dbe8ff;
-    color: var(--deep-blue);
-    font-weight: 700;
-    cursor: pointer;
-    border-radius: 8px;
-    user-select: none;
-    transition: background-color 0.25s ease;
-    box-shadow: inset 0 0 0 1px var(--deep-blue);
-  }
-  li:hover {
-    background-color: var(--bright-orange);
-    color: white;
-    box-shadow: none;
-  }
-  /* Right side: recent searches */
-  #recentSearches {
-    width: 240px;
-    background: #f0f5ff;
-    border: 2px solid var(--deep-blue);
-    border-radius: 10px;
-    padding: 1rem 1.25rem;
-    box-sizing: border-box;
-    font-size: 0.95rem;
-    color: var(--deep-blue);
-    display: flex;
-    flex-direction: column;
-    max-height: 100%;
-    overflow-y: auto;
-  }
-  #recentSearches h3 {
-    margin-top: 0;
-    margin-bottom: 0.75rem;
-    font-weight: 800;
-    font-size: 1.25rem;
-    border-bottom: 2px solid var(--bright-orange);
-    padding-bottom: 0.4rem;
-  }
-  #recentList {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    flex-grow: 1;
-  }
-  #recentList li {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 0.6rem;
-    padding: 0.4rem 0.7rem;
-    background: #c9ddff;
-    border-radius: 7px;
-    box-shadow: inset 0 0 0 1px var(--deep-blue);
-    font-weight: 600;
-    user-select: none;
-  }
-  #recentList li:last-child {
-    margin-bottom: 0;
-  }
-  .copyBtn {
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    color: var(--deep-blue);
-    font-weight: 700;
-    font-size: 0.95rem;
-    user-select: none;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    padding: 0;
-    transition: color 0.3s ease;
-  }
-  .copyBtn:hover {
-    color: var(--bright-orange);
-  }
-  /* SVG icon styling */
-  .copyBtn svg {
-    stroke: currentColor;
-  }
-  @media screen and (max-width: 720px) {
-    main {
-      flex-direction: column;
-      max-width: 95%;
-      min-height: auto;
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Rego Check | Australia</title>
+  <link rel="icon" href="https://i.imgur.com/tM2lY0B.png" />
+  <style>
+    :root {
+      --deep-blue: #002855;
+      --bright-orange: #ff7f27;
+      --light-bg: #f7f7f7;
+      --dark-text: #1a1a1a;
     }
-    #recentSearches {
-      width: 100%;
-      margin-top: 1.5rem;
-      max-height: 280px;
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: var(--light-bg);
+      color: var(--dark-text);
+    }
+    header {
+      background-color: var(--deep-blue);
+      color: white;
+      padding: 0.8rem;
+      text-align: center;
+      box-shadow: 0 4px 8px rgb(0 40 85 / 0.3);
+    }
+    header h1 {
+      margin: 0;
+      font-weight: 700;
+      font-size: 1.8rem;
+    }
+    main {
+      max-width: 920px;
+      margin: 1rem auto;
+      background: white;
+      padding: 1.5rem;
+      border-radius: 10px;
+      box-shadow: 0 6px 16px rgb(0 40 85 / 0.15);
+      display: flex;
+      gap: 1.5rem;
+      justify-content: space-between;
+      align-items: flex-start;
     }
     #leftPanel {
-      max-width: none;
+      flex: 1 1 560px;
     }
-  }
-</style>
+    input[type="text"] {
+      width: 100%;
+      padding: 1rem;
+      font-size: 1.3rem;
+      border: 2px solid var(--deep-blue);
+      border-radius: 8px;
+      text-transform: uppercase;
+      letter-spacing: 2.5px;
+      box-sizing: border-box;
+      font-weight: 600;
+      transition: border-color 0.3s ease;
+    }
+    input[type="text"]:focus {
+      outline: none;
+      border-color: var(--bright-orange);
+      box-shadow: 0 0 6px var(--bright-orange);
+    }
+    ul {
+      list-style-type: none;
+      padding: 0;
+      margin-top: 1.5rem;
+    }
+    li {
+      margin: 0.5rem 0;
+      padding: 0.85rem 1.2rem;
+      background: #dbe8ff;
+      color: var(--deep-blue);
+      font-weight: 700;
+      cursor: pointer;
+      border-radius: 8px;
+      user-select: none;
+      transition: background-color 0.25s ease;
+      box-shadow: inset 0 0 0 1px var(--deep-blue);
+    }
+    li:hover {
+      background-color: var(--bright-orange);
+      color: white;
+      box-shadow: none;
+    }
+    #recentSearches {
+      width: 240px;
+      background: #f0f5ff;
+      border: 2px solid var(--deep-blue);
+      border-radius: 10px;
+      padding: 1rem 1.25rem;
+      box-sizing: border-box;
+      font-size: 0.95rem;
+      color: var(--deep-blue);
+      display: flex;
+      flex-direction: column;
+      max-height: 100%;
+    }
+    #recentSearches h3 {
+      margin-top: 0;
+      margin-bottom: 0.75rem;
+      font-weight: 800;
+      font-size: 1.25rem;
+      border-bottom: 2px solid var(--bright-orange);
+      padding-bottom: 0.4rem;
+    }
+    #recentList {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    #recentList li {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.6rem;
+      padding: 0.4rem 0.7rem;
+      background: #c9ddff;
+      border-radius: 7px;
+      box-shadow: inset 0 0 0 1px var(--deep-blue);
+      font-weight: 600;
+      user-select: none;
+    }
+    .copyBtn {
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      color: var(--deep-blue);
+      font-weight: 700;
+      font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 0;
+      transition: color 0.3s ease;
+    }
+    .copyBtn:hover {
+      color: var(--bright-orange);
+    }
+    .copyBtn svg {
+      stroke: currentColor;
+    }
+    @media screen and (max-width: 720px) {
+      main {
+        flex-direction: column;
+        max-width: 95%;
+      }
+      #recentSearches {
+        width: 100%;
+        margin-top: 1.5rem;
+      }
+    }
+  </style>
 </head>
 <body>
 <header>
@@ -184,7 +169,6 @@
     <ul id="recentList" aria-live="polite" aria-relevant="additions"></ul>
   </aside>
 </main>
-
 <script>
   const stateLinks = {
     VIC: "https://www.vicroads.vic.gov.au/registration/buy-sell-or-transfer-a-vehicle/check-vehicle-registration/vehicle-registration-enquiry",
@@ -211,18 +195,13 @@
   const input = document.getElementById("regoInput");
   const result = document.getElementById("result");
   const recentList = document.getElementById("recentList");
-
-  // Store last 18 regos searched
   let recentRegos = [];
 
   function openAndFocus(url) {
     const newWindow = window.open(url, "_blank");
-    if (newWindow) {
-      newWindow.focus();
-    }
+    if (newWindow) newWindow.focus();
   }
 
-  // Updated buildStateList: attach onclick to call onStateClick
   function buildStateList(rego) {
     if (!rego || rego.length < 2) {
       result.innerHTML = "";
@@ -236,7 +215,6 @@
     result.innerHTML = html;
   }
 
-  // New global function to handle state click from list
   function onStateClick(state, rego) {
     const url = stateLinks[state];
     if (url) {
@@ -249,12 +227,9 @@
 
   function addRecentRego(rego) {
     rego = rego.toUpperCase();
-    // Avoid duplicates
     recentRegos = recentRegos.filter(r => r !== rego);
     recentRegos.unshift(rego);
-    if (recentRegos.length > 18) {
-      recentRegos.pop();
-    }
+    if (recentRegos.length > 13) recentRegos.pop();
     renderRecentList();
   }
 
@@ -268,18 +243,9 @@
       btn.className = "copyBtn";
       btn.title = `Copy ${rego}`;
       btn.innerHTML = `
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="16"
-          height="16"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          style="margin-right: 6px;"
-          viewBox="0 0 24 24"
-        >
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+          viewBox="0 0 24 24">
           <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
           <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
         </svg>
@@ -288,21 +254,12 @@
       btn.addEventListener("click", e => {
         e.stopPropagation();
         navigator.clipboard.writeText(rego).then(() => {
-          btn.innerHTML = "Copied!";
+          btn.textContent = "Copied!";
           setTimeout(() => {
             btn.innerHTML = `
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="16"
-                height="16"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                style="margin-right: 6px;"
-                viewBox="0 0 24 24"
-              >
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                viewBox="0 0 24 24">
                 <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
                 <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
               </svg>
