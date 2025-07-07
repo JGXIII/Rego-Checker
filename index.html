@@ -46,23 +46,63 @@
     header h1 {
       margin: 0;
       font-size: 1.8rem;
+      color: inherit;
     }
 
-    .theme-toggle {
-      background: none;
-      border: none;
-      cursor: pointer;
-      color: white;
-      font-size: 1rem;
+    .theme-toggle-wrapper {
       display: flex;
       align-items: center;
       gap: 0.5rem;
     }
 
-    .theme-toggle svg {
-      width: 20px;
-      height: 20px;
-      transition: transform 0.4s ease;
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 46px;
+      height: 24px;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: 0.4s;
+      border-radius: 24px;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: 0.4s;
+      border-radius: 50%;
+    }
+
+    input:checked + .slider {
+      background-color: var(--accent);
+    }
+
+    input:checked + .slider:before {
+      transform: translateX(22px);
+    }
+
+    .toggle-label {
+      font-size: 0.9rem;
+      color: white;
     }
 
     main {
@@ -180,38 +220,19 @@
       width: 16px;
       height: 16px;
     }
-
-    @media (max-width: 768px) {
-      main {
-        flex-direction: column;
-        align-items: stretch;
-        overflow-y: auto;
-      }
-
-      #recentSearches {
-        width: 100%;
-        margin-top: 1rem;
-      }
-
-      #result ul {
-        grid-template-columns: 1fr;
-      }
-    }
   </style>
 </head>
 <body>
   <header>
     <h1>Rego Check</h1>
-    <button class="theme-toggle" id="themeToggle">
-      <span id="themeText">Dark Mode</span>
-      <svg id="themeIcon" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor"
-        stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-moon"
-        viewBox="0 0 24 24">
-        <path d="M21 12.79A9 9 0 0111.21 3 7 7 0 0012 21a9 9 0 009-8.21z" />
-      </svg>
-    </button>
+    <div class="theme-toggle-wrapper">
+      <span class="toggle-label">Dark Mode</span>
+      <label class="switch">
+        <input type="checkbox" id="themeSwitch">
+        <span class="slider"></span>
+      </label>
+    </div>
   </header>
-
   <main>
     <div id="leftPanel">
       <input type="text" id="regoInput" placeholder="e.g. AXH950 or AXH950 V" />
@@ -314,32 +335,24 @@
       }
     });
 
-    // Dark mode toggle logic
-    const themeToggle = document.getElementById("themeToggle");
-    const themeIcon = document.getElementById("themeIcon");
-    const themeText = document.getElementById("themeText");
+    const toggle = document.getElementById("themeSwitch");
+    const savedTheme = localStorage.getItem("theme");
 
     function applyTheme(theme) {
       document.documentElement.setAttribute("data-theme", theme);
       localStorage.setItem("theme", theme);
-      themeText.textContent = theme === "dark" ? "Light Mode" : "Dark Mode";
-      themeIcon.innerHTML = theme === "dark"
-        ? '<circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>'
-        : '<path d="M21 12.79A9 9 0 0111.21 3 7 7 0 0012 21a9 9 0 009-8.21z" />';
+      toggle.checked = theme === "dark";
     }
 
-    themeToggle.onclick = () => {
-      const current = document.documentElement.getAttribute("data-theme");
-      applyTheme(current === "dark" ? "light" : "dark");
-    };
+    toggle.addEventListener("change", () => {
+      applyTheme(toggle.checked ? "dark" : "light");
+    });
 
-    const savedTheme = localStorage.getItem("theme");
     if (savedTheme) {
       applyTheme(savedTheme);
-    } else if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
-      applyTheme("dark");
     } else {
-      applyTheme("light");
+      const systemPref = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      applyTheme(systemPref);
     }
   </script>
 </body>
