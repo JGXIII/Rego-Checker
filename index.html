@@ -16,29 +16,30 @@
 
   <input type="text" id="regoInput" placeholder="e.g. AXH950">
   <button onclick="checkRego()">Check Registration</button>
+  <button onclick="copyRego()">Copy Rego</button>
 
   <div id="result" style="margin-top: 2rem;"></div>
 
   <script>
     const states = {
       NSW: {
-        url: "https://www.service.nsw.gov.au/transaction/check-vehicle-registration",
+        url: "https://check-registration.service.nsw.gov.au/?isLoginRequired=true",
         pattern: /^[A-Z]{1,3}\d{1,4}$/
       },
       VIC: {
         url: "https://www.vicroads.vic.gov.au/registration/buy-sell-or-transfer-a-vehicle/check-vehicle-registration/vehicle-registration-enquiry",
-        pattern: /^[A-Z]{3}\d{3}$/ // e.g. AXH950
+        pattern: /^[A-Z]{3}\d{3}$/
       },
       QLD: {
-        url: "https://www.qld.gov.au/transport/registration/check",
+        url: "https://www.service.transport.qld.gov.au/checkrego/public/Welcome.xhtml",
         pattern: /^[0-9]{3}[A-Z]{3}$|^[A-Z]{3}[0-9]{3}$/
       },
       SA: {
-        url: "https://www.sa.gov.au/topics/driving-and-transport/registration/rego-check",
+        url: "https://account.ezyreg.sa.gov.au/account/check-registration.htm",
         pattern: /^[A-Z]{3}\d{3}$/
       },
       WA: {
-        url: "https://www.transport.wa.gov.au/licensing/check-my-vehicle-registration.asp",
+        url: "https://online.transport.wa.gov.au/webExternal/registration/",
         pattern: /^[0-9]{1,6}$|^[A-Z]{1,3}\d{1,3}$/
       },
       TAS: {
@@ -46,11 +47,11 @@
         pattern: /^[A-Z]{2,3}\d{1,3}$/
       },
       ACT: {
-        url: "https://rego.act.gov.au/",
+        url: "https://rego.act.gov.au/regosoawicket/public/reg/FindRegistrationPage",
         pattern: /^[Y]{1}[A-Z]{2}\d{2,3}$|^[A-Z]{3}\d{3}$/
       },
       NT: {
-        url: "https://nt.gov.au/driving/rego/check,-renew-or-transfer-registration/check-registration",
+        url: "https://nt.gov.au/driving/rego/existing-nt-registration/rego-check",
         pattern: /^[A-Z]{1,3}\d{1,4}$/
       }
     };
@@ -71,7 +72,7 @@
 
       if (matches.length === 0) {
         result.innerHTML = `<p>We couldn’t detect a matching state format. Please choose your state below:</p>`;
-        result.innerHTML += makeStateList(Object.entries(states));
+        result.innerHTML += makeStateList(Object.entries(states), raw);
         return;
       }
 
@@ -85,16 +86,28 @@
       }
 
       result.innerHTML = `<p>This plate matches multiple states. Please choose the correct one:</p>`;
-      result.innerHTML += makeStateList(matches.map(m => [m.state, m.url]));
+      result.innerHTML += makeStateList(matches.map(m => [m.state, m.url]), raw);
     }
 
-    function makeStateList(list) {
+    function makeStateList(list, rego) {
       let html = "<ul>";
       list.forEach(([state, url]) => {
         html += `<li><a href="${url}" target="_blank">${state} Rego Check</a></li>`;
       });
       html += "</ul>";
       return html;
+    }
+
+    function copyRego() {
+      const regoInput = document.getElementById('regoInput');
+      regoInput.select();
+      regoInput.setSelectionRange(0, 99999); // For mobile devices
+
+      navigator.clipboard.writeText(regoInput.value).then(() => {
+        alert("Registration number copied to clipboard.");
+      }, () => {
+        alert("Failed to copy registration number.");
+      });
     }
   </script>
 </body>
