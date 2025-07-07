@@ -11,48 +11,47 @@
   </style>
 </head>
 <body>
-  <h1>Smart Vehicle Registration Checker (AU)</h1>
-  <p>Enter your plate below — we’ll take you straight to the right state site if we can.</p>
+  <h1>Smart Vehicle Registration Checker (Australia)</h1>
+  <p>Enter your number plate below. If we can tell the state from the format, we'll redirect you to the right rego checker. If not, you'll be able to choose.</p>
 
-  <input type="text" id="regoInput" placeholder="e.g. ABC123">
+  <input type="text" id="regoInput" placeholder="e.g. AXH950">
   <button onclick="checkRego()">Check Registration</button>
 
-  <div id="result"></div>
+  <div id="result" style="margin-top: 2rem;"></div>
 
   <script>
-    // 1. State info: URL + a simple regex to "match" their typical plate format
     const states = {
       NSW: {
         url: "https://www.service.nsw.gov.au/transaction/check-vehicle-registration",
-        pattern: /^[A-Z]{1,3}\d{1,3}$/ // e.g. ABC123 or AB12
+        pattern: /^[A-Z]{1,3}\d{1,4}$/
       },
       VIC: {
-        url: "https://www.vicroads.vic.gov.au/registration/registration-enquiry",
-        pattern: /^[A-Z]{3}\d{3}$/    // e.g. ABC123
+        url: "https://www.vicroads.vic.gov.au/registration/rego-check",
+        pattern: /^[A-Z]{3}\d{3}$/ // e.g. AXH950
       },
       QLD: {
         url: "https://www.qld.gov.au/transport/registration/check",
-        pattern: /^[A-Z]{3}\d{3}$/    // same as VIC, so ambiguous
+        pattern: /^[0-9]{3}[A-Z]{3}$|^[A-Z]{3}[0-9]{3}$/ // e.g. 123ABC or ABC123
       },
       SA: {
         url: "https://www.sa.gov.au/topics/driving-and-transport/registration/rego-check",
-        pattern: /^[A-Z]{3}\s?\d{3}$/ // ABC 123 or ABC123
+        pattern: /^[A-Z]{3}\d{3}$/
       },
       WA: {
         url: "https://www.transport.wa.gov.au/licensing/check-my-vehicle-registration.asp",
-        pattern: /^[A-Z]{2}\s?\d{3}$/ // AB 123
+        pattern: /^[0-9]{1,6}$|^[A-Z]{1,3}\d{1,3}$/
       },
       TAS: {
         url: "https://www.transport.tas.gov.au/MRSWebInterface/public/regoLookup/registrationLookup.xhtml",
-        pattern: /^[A-Z]{2,3}\d{1,3}$/ // AB123 or ABC12
+        pattern: /^[A-Z]{2,3}\d{1,3}$/
       },
       ACT: {
-        url: "https://www.accesscanberra.act.gov.au/app/answers/detail/a_id/1804/~/rego-check-online",
-        pattern: /^[A-Z]{3}\s?\d{3}$/ // ABC 123
+        url: "https://rego.act.gov.au/",
+        pattern: /^[Y]{1}[A-Z]{2}\d{2,3}$|^[A-Z]{3}\d{3}$/ // YAB123 or ABC123
       },
       NT: {
         url: "https://nt.gov.au/driving/rego/check,-renew-or-transfer-registration/check-registration",
-        pattern: /^[A-Z]{2}\s?\d{3}$/ // AB 123
+        pattern: /^[CDEFGHJKLMNPRSTWXYZ]{1,3}\d{1,4}$/
       }
     };
 
@@ -66,36 +65,29 @@
         return;
       }
 
-      // 2. Find which states match the regex
       const matches = Object.entries(states)
         .filter(([_, info]) => info.pattern.test(raw))
         .map(([state, info]) => ({ state, url: info.url }));
 
-      // 3a. No match → show all
       if (matches.length === 0) {
-        result.innerHTML = `<p>Couldn’t detect your state from the format.<br>
-          <em>Please choose from:</em></p>` +
-          makeStateList(Object.entries(states));
+        result.innerHTML = `<p>We couldn’t detect a matching plate format. Please choose your state below:</p>`;
+        result.innerHTML += makeStateList(Object.entries(states));
         return;
       }
 
-      // 3b. Exactly one match → auto-redirect
       if (matches.length === 1) {
         const { state, url } = matches[0];
-        result.innerHTML = `<p>Detected <strong>${state}</strong> plate format — redirecting you now…</p>`;
-        // slight delay so message shows
+        result.innerHTML = `<p>Detected <strong>${state}</strong> rego format. Redirecting you now…</p>`;
         setTimeout(() => {
           window.open(url, "_blank");
-        }, 800);
+        }, 1000);
         return;
       }
 
-      // 3c. Multiple possible states → let user pick
-      result.innerHTML = `<p>Your plate could belong to multiple states. Please choose:</p>`;
+      result.innerHTML = `<p>This rego could belong to more than one state. Please choose:</p>`;
       result.innerHTML += makeStateList(matches.map(m => [m.state, m.url]));
     }
 
-    // Helper: build a <ul> of links from [ [state, url], … ]
     function makeStateList(list) {
       let html = "<ul>";
       list.forEach(([state, url]) => {
