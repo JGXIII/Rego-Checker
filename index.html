@@ -13,6 +13,8 @@
       --primary: #002855;
       --accent: #ff7f27;
       --secondary-bg: #e6f0ff;
+      --header-bg: #002855;
+      --header-text: white;
     }
 
     [data-theme="dark"] {
@@ -22,6 +24,8 @@
       --primary: #ffffff;
       --accent: #ff7f27;
       --secondary-bg: #1c293a;
+      --header-bg: #161b22;
+      --header-text: #ffffff;
     }
 
     html, body {
@@ -35,34 +39,36 @@
     }
 
     header {
-      background-color: var(--primary);
-      color: white;
-      padding: 0.8rem 1rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+      background-color: var(--header-bg);
+      color: var(--header-text);
+      padding: 1rem 1rem;
+      text-align: center;
+      position: relative;
     }
 
     header h1 {
       margin: 0;
       font-size: 1.8rem;
-      color: inherit;
+      font-weight: bold;
     }
 
-    .theme-toggle-wrapper {
+    .theme-toggle-container {
+      position: absolute;
+      right: 1rem;
+      top: 1rem;
       display: flex;
       align-items: center;
       gap: 0.5rem;
     }
 
-    .switch {
+    .toggle-switch {
       position: relative;
       display: inline-block;
-      width: 46px;
+      width: 48px;
       height: 24px;
     }
 
-    .switch input {
+    .toggle-switch input {
       opacity: 0;
       width: 0;
       height: 0;
@@ -77,7 +83,7 @@
       bottom: 0;
       background-color: #ccc;
       transition: 0.4s;
-      border-radius: 24px;
+      border-radius: 34px;
     }
 
     .slider:before {
@@ -85,7 +91,7 @@
       content: "";
       height: 18px;
       width: 18px;
-      left: 3px;
+      left: 4px;
       bottom: 3px;
       background-color: white;
       transition: 0.4s;
@@ -97,12 +103,7 @@
     }
 
     input:checked + .slider:before {
-      transform: translateX(22px);
-    }
-
-    .toggle-label {
-      font-size: 0.9rem;
-      color: white;
+      transform: translateX(24px);
     }
 
     main {
@@ -111,7 +112,7 @@
       align-items: flex-start;
       padding: 1rem;
       gap: 2rem;
-      height: calc(100% - 70px);
+      height: calc(100% - 80px);
       box-sizing: border-box;
     }
 
@@ -220,19 +221,36 @@
       width: 16px;
       height: 16px;
     }
+
+    @media (max-width: 768px) {
+      main {
+        flex-direction: column;
+        align-items: stretch;
+        overflow-y: auto;
+      }
+
+      #recentSearches {
+        width: 100%;
+        margin-top: 1rem;
+      }
+
+      #result ul {
+        grid-template-columns: 1fr;
+      }
+    }
   </style>
 </head>
 <body>
   <header>
     <h1>Rego Check</h1>
-    <div class="theme-toggle-wrapper">
-      <span class="toggle-label">Dark Mode</span>
-      <label class="switch">
-        <input type="checkbox" id="themeSwitch">
+    <div class="theme-toggle-container">
+      <label class="toggle-switch">
+        <input type="checkbox" id="themeToggle" />
         <span class="slider"></span>
       </label>
     </div>
   </header>
+
   <main>
     <div id="leftPanel">
       <input type="text" id="regoInput" placeholder="e.g. AXH950 or AXH950 V" />
@@ -264,6 +282,8 @@
     const input = document.getElementById("regoInput");
     const result = document.getElementById("result");
     const recentList = document.getElementById("recentList");
+    const themeToggle = document.getElementById("themeToggle");
+
     let recentRegos = [];
 
     function addRecentRego(rego) {
@@ -335,24 +355,24 @@
       }
     });
 
-    const toggle = document.getElementById("themeSwitch");
-    const savedTheme = localStorage.getItem("theme");
-
-    function applyTheme(theme) {
-      document.documentElement.setAttribute("data-theme", theme);
-      localStorage.setItem("theme", theme);
-      toggle.checked = theme === "dark";
+    // Theme management
+    function setTheme(mode) {
+      document.documentElement.setAttribute("data-theme", mode);
+      localStorage.setItem("theme", mode);
+      themeToggle.checked = mode === "dark";
     }
 
-    toggle.addEventListener("change", () => {
-      applyTheme(toggle.checked ? "dark" : "light");
+    themeToggle.addEventListener("change", () => {
+      setTheme(themeToggle.checked ? "dark" : "light");
     });
 
+    // On load, set theme based on system or saved
+    const savedTheme = localStorage.getItem("theme");
     if (savedTheme) {
-      applyTheme(savedTheme);
+      setTheme(savedTheme);
     } else {
-      const systemPref = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-      applyTheme(systemPref);
+      const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+      setTheme(prefersDark ? "dark" : "light");
     }
   </script>
 </body>
