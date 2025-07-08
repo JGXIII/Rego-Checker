@@ -261,6 +261,17 @@
       NT: "https://nt.gov.au/driving/rego/existing-nt-registration/rego-check"
     };
 
+    const stateAbbreviations = {
+      V: "VIC",
+      N: "NSW",
+      Q: "QLD",
+      S: "SA",
+      W: "WA",
+      T: "TAS",
+      A: "ACT",
+      X: "NT"
+    };
+
     const input = document.getElementById("regoInput");
     const result = document.getElementById("result");
     const recentList = document.getElementById("recentList");
@@ -308,7 +319,7 @@
 
     input.addEventListener("input", () => {
       let val = input.value.trim().toUpperCase();
-      let [rego, suffix] = val.split(" ");
+      let [rego, code] = val.split(" ");
 
       if (!rego || rego.length < 2) {
         result.innerHTML = "";
@@ -317,12 +328,15 @@
 
       navigator.clipboard.writeText(rego);
 
-      if (suffix && stateLinks[suffix]) {
-        window.open(stateLinks[suffix], "_blank");
-        addRecentRego(rego);
-        input.value = "";
-        result.innerHTML = "";
-        return;
+      if (code && stateAbbreviations[code]) {
+        const fullState = stateAbbreviations[code];
+        if (stateLinks[fullState]) {
+          window.open(stateLinks[fullState], "_blank");
+          addRecentRego(rego);
+          input.value = "";
+          result.innerHTML = "";
+          return;
+        }
       }
 
       buildStateList(rego);
