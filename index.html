@@ -230,6 +230,121 @@
   </style>
 </head>
 <body>
-<!-- Previous working code is restored here -->
+  <header>
+    <h1>Rego Check</h1>
+    <div class="theme-toggle-container">
+      <label class="toggle-switch">
+        <input type="checkbox" id="themeToggle" />
+        <span class="slider"></span>
+      </label>
+    </div>
+  </header>
+  <main>
+    <div id="leftPanel">
+      <input type="text" id="regoInput" placeholder="e.g. AXH950 or AXH950 V" />
+      <div id="result"></div>
+    </div>
+    <aside id="recentSearches">
+      <h3>Recent Regos</h3>
+      <ul id="recentList"></ul>
+    </aside>
+  </main>
+  <script>
+    const stateLinks = {
+      VIC: "https://www.vicroads.vic.gov.au/registration/buy-sell-or-transfer-a-vehicle/check-vehicle-registration/vehicle-registration-enquiry",
+      NSW: "https://check-registration.service.nsw.gov.au/?isLoginRequired=true",
+      QLD: "https://www.service.transport.qld.gov.au/checkrego/application/VehicleSearch.xhtml?dswid=-124",
+      SA: "https://account.ezyreg.sa.gov.au/account/check-registration.htm#error=login_required",
+      WA: "https://online.transport.wa.gov.au/webExternal/registration/",
+      TAS: "https://www.transport.tas.gov.au/MRSWebInterface/public/regoLookup/registrationLookup.xhtml",
+      ACT: "https://rego.act.gov.au/regosoawicket/public/reg/FindRegistrationPage",
+      NT: "https://nt.gov.au/driving/rego/existing-nt-registration/rego-check"
+    };
+
+    const input = document.getElementById("regoInput");
+    const result = document.getElementById("result");
+    const recentList = document.getElementById("recentList");
+    const themeToggle = document.getElementById("themeToggle");
+    let recentRegos = [];
+
+    function addRecentRego(rego) {
+      rego = rego.toUpperCase();
+      if (!rego) return;
+      recentRegos = recentRegos.filter(r => r !== rego);
+      recentRegos.unshift(rego);
+      if (recentRegos.length > 13) recentRegos.pop();
+      renderRecentList();
+    }
+
+    function renderRecentList() {
+      recentList.innerHTML = "";
+      recentRegos.forEach(rego => {
+        const li = document.createElement("li");
+        li.textContent = rego;
+
+        const btn = document.createElement("button");
+        btn.className = "copyBtn";
+        btn.title = `Copy ${rego}`;
+        btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> Copy`;
+        btn.onclick = () => {
+          navigator.clipboard.writeText(rego);
+          btn.innerHTML = "Copied!";
+          setTimeout(renderRecentList, 1500);
+        };
+
+        li.appendChild(btn);
+        recentList.appendChild(li);
+      });
+    }
+
+    function buildStateList(rego) {
+      let html = "<ul>";
+      Object.entries(stateLinks).forEach(([state, url]) => {
+        html += `<li onclick="window.open('${url}', '_blank'); addRecentRego('${rego}'); input.value=''; result.innerHTML='';">${state}</li>`;
+      });
+      html += "</ul>";
+      result.innerHTML = html;
+    }
+
+    input.addEventListener("input", () => {
+      let val = input.value.trim().toUpperCase();
+      let [rego, suffix] = val.split(" ");
+
+      if (!rego || rego.length < 2) {
+        result.innerHTML = "";
+        return;
+      }
+
+      navigator.clipboard.writeText(rego);
+
+      if (suffix && stateLinks[suffix]) {
+        window.open(stateLinks[suffix], "_blank");
+        addRecentRego(rego);
+        input.value = "";
+        result.innerHTML = "";
+        return;
+      }
+
+      buildStateList(rego);
+    });
+
+    function setTheme(mode) {
+      document.documentElement.setAttribute("data-theme", mode);
+      localStorage.setItem("theme", mode);
+      themeToggle.checked = mode === "dark";
+    }
+
+    themeToggle.addEventListener("change", () => {
+      setTheme(themeToggle.checked ? "dark" : "light");
+    });
+
+    const savedTheme = localStorage.getItem("theme");
+    if (savedTheme) {
+      setTheme(savedTheme);
+    } else {
+      const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+      setTheme(prefersDark ? "dark" : "light");
+    }
+  </script>
 </body>
 </html>
