@@ -207,20 +207,12 @@ background:none;
 border:none;
 cursor:pointer;
 font-weight:bold;
-display:flex;
-align-items:center;
-gap:4px;
 color:var(--primary);
-}
-
-.copyBtn svg{
-width:14px;
-height:14px;
 }
 
 .historyRow{
 display:grid;
-grid-template-columns:170px 1fr 20px;
+grid-template-columns:170px 1fr 60px 24px;
 gap:4px;
 margin-bottom:4px;
 align-items:center;
@@ -234,22 +226,21 @@ border:1px solid #999;
 }
 
 .deleteBtn{
+width:20px;
+height:20px;
+border-radius:50%;
 border:none;
-background:transparent;
-cursor:pointer;
+background:#d33;
+color:white;
 font-weight:bold;
-color:#cc0000;
+cursor:pointer;
+display:flex;
+align-items:center;
+justify-content:center;
 }
 
-.clearBtn{
-background:var(--accent);
-border:none;
-padding:5px 8px;
-border-radius:6px;
-color:white;
-cursor:pointer;
-font-size:12px;
-margin-bottom:6px;
+.deleteBtn:hover{
+background:#ff0000;
 }
 
 </style>
@@ -288,13 +279,7 @@ margin-bottom:6px;
 
 <div id="recentPanel" class="panel"></div>
 
-<div id="historyPanel" class="panel" style="display:none">
-
-<button class="clearBtn" onclick="clearHistory()">Clear History</button>
-
-<div id="historyList"></div>
-
-</div>
+<div id="historyPanel" class="panel" style="display:none"></div>
 
 </div>
 
@@ -314,17 +299,7 @@ NT:"https://nt.gov.au/driving/rego/existing-nt-registration/rego-check",
 NHVR:"https://www.service.nhvr.gov.au/#page=informationHub/nHVASAVMSearch"
 };
 
-const stateAbbrev={
-V:"VIC",
-N:"NSW",
-Q:"QLD",
-S:"SA",
-W:"WA",
-T:"TAS",
-A:"ACT",
-X:"NT",
-H:"NHVR"
-};
+const stateAbbrev={V:"VIC",N:"NSW",Q:"QLD",S:"SA",W:"WA",T:"TAS",A:"ACT",X:"NT",H:"NHVR"};
 
 const input=document.getElementById("regoInput");
 const result=document.getElementById("result");
@@ -341,7 +316,6 @@ function addRecent(rego){
 
 recent=recent.filter(r=>r!==rego);
 recent.unshift(rego);
-
 if(recent.length>20) recent.pop();
 
 const d=new Date();
@@ -354,7 +328,6 @@ notes:""
 });
 
 save();
-
 renderRecent();
 renderHistory();
 }
@@ -367,14 +340,11 @@ panel.innerHTML="";
 recent.forEach(r=>{
 
 const div=document.createElement("div");
-
 div.className="listItem";
 
 div.innerHTML=`
 <span>${r}</span>
-<button class="copyBtn" onclick="navigator.clipboard.writeText('${r}')">
-Copy
-</button>
+<button class="copyBtn" onclick="navigator.clipboard.writeText('${r}')">Copy</button>
 `;
 
 panel.appendChild(div);
@@ -385,22 +355,18 @@ panel.appendChild(div);
 
 function renderHistory(){
 
-const panel=document.getElementById("historyList");
-
+const panel=document.getElementById("historyPanel");
 panel.innerHTML="";
 
 history.forEach((h,i)=>{
 
 const row=document.createElement("div");
-
 row.className="historyRow";
 
 const date=document.createElement("div");
-
 date.textContent=h.date;
 
 const note=document.createElement("input");
-
 note.value=h.rego+" - "+h.notes;
 
 note.onchange=()=>{
@@ -408,10 +374,13 @@ history[i].notes=note.value.replace(h.rego+" - ","");
 save();
 };
 
+const copy=document.createElement("button");
+copy.textContent="Copy";
+copy.className="copyBtn";
+copy.onclick=()=>navigator.clipboard.writeText(h.rego);
+
 const del=document.createElement("button");
-
 del.textContent="✕";
-
 del.className="deleteBtn";
 
 del.onclick=()=>{
@@ -422,6 +391,7 @@ renderHistory();
 
 row.appendChild(date);
 row.appendChild(note);
+row.appendChild(copy);
 row.appendChild(del);
 
 panel.appendChild(row);
@@ -430,30 +400,15 @@ panel.appendChild(row);
 
 }
 
-function clearHistory(){
-
-if(confirm("Clear all history?")){
-
-history=[];
-save();
-renderHistory();
-
-}
-
-}
-
 function buildStates(rego){
 
 let html="<ul>";
 
 Object.entries(stateLinks).forEach(([state,url])=>{
-
 html+=`<li onclick="window.open('${url}','_blank');addRecent('${rego}');input.value='';">${state}</li>`;
-
 });
 
 html+="</ul>";
-
 result.innerHTML=html;
 
 }
@@ -461,7 +416,6 @@ result.innerHTML=html;
 input.addEventListener("input",()=>{
 
 let val=input.value.trim().toUpperCase();
-
 let [rego,code]=val.split(" ");
 
 if(!rego) return;
@@ -469,15 +423,10 @@ if(!rego) return;
 navigator.clipboard.writeText(rego);
 
 if(code && stateAbbrev[code]){
-
 let state=stateAbbrev[code];
-
 window.open(stateLinks[state],"_blank");
-
 addRecent(rego);
-
 input.value="";
-
 }
 
 });
@@ -489,17 +438,13 @@ function switchTab(tab){
 document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
 
 if(tab==="recent"){
-
 document.getElementById("recentPanel").style.display="block";
 document.getElementById("historyPanel").style.display="none";
 document.querySelectorAll(".tab")[0].classList.add("active");
-
 }else{
-
 document.getElementById("recentPanel").style.display="none";
 document.getElementById("historyPanel").style.display="block";
 document.querySelectorAll(".tab")[1].classList.add("active");
-
 }
 
 }
@@ -510,33 +455,22 @@ renderHistory();
 const toggle=document.getElementById("themeToggle");
 
 function setTheme(mode){
-
 document.documentElement.setAttribute("data-theme",mode);
-
 localStorage.setItem("theme",mode);
-
 toggle.checked=(mode==="dark");
-
 }
 
 toggle.addEventListener("change",()=>{
-
 setTheme(toggle.checked?"dark":"light");
-
 });
 
 const saved=localStorage.getItem("theme");
 
 if(saved){
-
 setTheme(saved);
-
 }else{
-
 const dark=window.matchMedia("(prefers-color-scheme: dark)").matches;
-
 setTheme(dark?"dark":"light");
-
 }
 
 </script>
