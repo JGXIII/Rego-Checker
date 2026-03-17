@@ -6,7 +6,6 @@
 <title>Check Vehicle Registration</title>
 
 <style>
-
 :root{
 --bg:#f7f7f7;
 --text:#1a1a1a;
@@ -150,7 +149,7 @@ background:var(--accent);
 color:white;
 }
 
-#sidePanel{
+#historyPanel{
 width:460px;
 background:var(--card);
 border:2px solid var(--primary);
@@ -158,32 +157,6 @@ border-radius:10px;
 padding:0.8rem;
 box-sizing:border-box;
 height:80vh;
-display:flex;
-flex-direction:column;
-}
-
-.tabs{
-display:flex;
-border-bottom:2px solid var(--accent);
-margin-bottom:.5rem;
-}
-
-.tab{
-flex:1;
-padding:.4rem;
-text-align:center;
-cursor:pointer;
-font-weight:bold;
-}
-
-.tab.active{
-background:var(--accent);
-color:white;
-border-radius:6px 6px 0 0;
-}
-
-.panel{
-flex:1;
 overflow:auto;
 }
 
@@ -229,7 +202,6 @@ font-size:12px;
 }
 
 /* Floating toast */
-
 #copyToast{
 position:fixed;
 background:#333;
@@ -246,7 +218,6 @@ z-index:9999;
 #copyToast.show{
 opacity:1;
 }
-
 </style>
 </head>
 
@@ -254,44 +225,26 @@ opacity:1;
 
 <header>
 <h1>Check Vehicle Registration</h1>
-
 <div class="theme-toggle-container">
 <label class="toggle-switch">
 <input type="checkbox" id="themeToggle">
 <span class="slider"></span>
 </label>
 </div>
-
 </header>
 
 <main>
-
 <div id="leftPanel">
-
 <input id="regoInput" type="text" placeholder="ENTER REGO OR VIN HERE">
-
 <div id="result"></div>
-
 </div>
 
-<div id="sidePanel">
-
-<div class="tabs">
-<div class="tab active" onclick="switchTab('recent')">Recent</div>
-<div class="tab" onclick="switchTab('history')">History</div>
-</div>
-
-<div id="recentPanel" class="panel"></div>
-<div id="historyPanel" class="panel" style="display:none"></div>
-
-</div>
-
+<div id="historyPanel"></div>
 </main>
 
 <div id="copyToast">Copied</div>
 
 <script>
-
 const stateLinks={
 VIC:"https://www.vicroads.vic.gov.au/registration/buy-sell-or-transfer-a-vehicle/check-vehicle-registration/vehicle-registration-enquiry",
 NSW:"https://check-registration.service.nsw.gov.au/?isLoginRequired=true",
@@ -306,98 +259,43 @@ NHVR:"https://www.service.nhvr.gov.au/#page=informationHub/nHVASAVMSearch"
 
 const input=document.getElementById("regoInput");
 const result=document.getElementById("result");
+const historyPanel=document.getElementById("historyPanel");
 const toast=document.getElementById("copyToast");
 
-let recent=JSON.parse(localStorage.getItem("recentRegos")||"[]");
 let history=JSON.parse(localStorage.getItem("regoHistory")||"[]");
 
 function save(){
-localStorage.setItem("recentRegos",JSON.stringify(recent));
 localStorage.setItem("regoHistory",JSON.stringify(history));
 }
 
 function showCopyToast(btn){
-
 const rect=btn.getBoundingClientRect();
-
 toast.style.left=(rect.right+8)+"px";
 toast.style.top=(rect.top)+"px";
-
 toast.classList.add("show");
-
-setTimeout(()=>{
-toast.classList.remove("show");
-},900);
-
+setTimeout(()=>toast.classList.remove("show"),900);
 }
 
 function copyRego(rego,btn){
-
 navigator.clipboard.writeText(rego);
-
 showCopyToast(btn);
-
 }
 
-function addRecent(rego){
-
-recent=recent.filter(r=>r!==rego);
-recent.unshift(rego);
-if(recent.length>20) recent.pop();
-
+function addHistory(rego){
 const d=new Date();
 const pad=n=>String(n).padStart(2,'0');
-
 history.unshift({
 rego:rego,
 date:`${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`
 });
-
+if(history.length>50) history.pop();
 save();
-renderRecent();
 renderHistory();
 }
 
-function renderRecent(){
-
-const panel=document.getElementById("recentPanel");
-panel.innerHTML="";
-
-recent.forEach((r,i)=>{
-
-const row=document.createElement("div");
-row.className="listItem";
-
-const del=document.createElement("button");
-del.className="deleteBtn";
-del.textContent="✕";
-del.onclick=()=>{recent.splice(i,1);save();renderRecent();};
-
-const text=document.createElement("span");
-text.textContent=r;
-
-const copy=document.createElement("button");
-copy.className="copyBtn";
-copy.textContent="Copy";
-copy.onclick=()=>copyRego(r,copy);
-
-row.appendChild(del);
-row.appendChild(text);
-row.appendChild(copy);
-
-panel.appendChild(row);
-
-});
-
-}
-
 function renderHistory(){
-
-const panel=document.getElementById("historyPanel");
-panel.innerHTML="";
-
+historyPanel.innerHTML="";
 history.forEach((h,i)=>{
-
 const row=document.createElement("div");
 row.className="listItem";
 
@@ -418,77 +316,55 @@ row.appendChild(del);
 row.appendChild(text);
 row.appendChild(copy);
 
-panel.appendChild(row);
-
+historyPanel.appendChild(row);
 });
-
 }
 
 function buildStates(rego){
-
 let html="<ul>";
-
 Object.entries(stateLinks).forEach(([state,url])=>{
-html+=`<li onclick="window.open('${url}','_blank');addRecent('${rego}');input.value='';">${state}</li>`;
+html+=`<li onclick="window.open('${url}','_blank');addHistory('${rego}');input.value='';">${state}</li>`;
 });
-
 html+="</ul>";
 result.innerHTML=html;
-
 }
 
 input.addEventListener("input",()=>{
-
 let val=input.value.trim().toUpperCase();
-
 if(!val) return;
-
 navigator.clipboard.writeText(val);
-
 buildStates(val);
+});
 
+// Keyboard shortcut: space + letter
+input.addEventListener("keydown",(e)=>{
+if(e.key.length===1 && e.target.value.endsWith(" ")){
+const lastChar=e.key.toUpperCase();
+const mapping={"V":"VIC","N":"NSW","Q":"QLD","S":"SA","W":"WA","T":"TAS","A":"ACT","D":"NT","H":"NHVR"};
+const state=mapping[lastChar];
+if(state && input.value.trim().length>0){
+window.open(stateLinks[state],"_blank");
+addHistory(input.value.trim());
+input.value="";
+e.preventDefault();
+}
+}
 });
 
 buildStates("");
-
-function switchTab(tab){
-
-document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
-
-if(tab==="recent"){
-document.getElementById("recentPanel").style.display="block";
-document.getElementById("historyPanel").style.display="none";
-document.querySelectorAll(".tab")[0].classList.add("active");
-}else{
-document.getElementById("recentPanel").style.display="none";
-document.getElementById("historyPanel").style.display="block";
-document.querySelectorAll(".tab")[1].classList.add("active");
-}
-
-}
-
-renderRecent();
 renderHistory();
 
+// Dark mode toggle
 const toggle=document.getElementById("themeToggle");
-
 function setTheme(mode){
 document.documentElement.setAttribute("data-theme",mode);
 localStorage.setItem("theme",mode);
 toggle.checked=(mode==="dark");
 }
-
-toggle.addEventListener("change",()=>{
-setTheme(toggle.checked?"dark":"light");
-});
-
+toggle.addEventListener("change",()=>setTheme(toggle.checked?"dark":"light"));
 const saved=localStorage.getItem("theme");
-
-if(saved){
-setTheme(saved);
-}else{
-const dark=window.matchMedia("(prefers-color-scheme: dark)").matches;
-setTheme(dark?"dark":"light");
+if(saved){setTheme(saved);}else{
+setTheme(window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light");
 }
 
 </script>
