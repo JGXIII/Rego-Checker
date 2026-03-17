@@ -23,7 +23,6 @@
 --text:#f0f0f0;
 --card:#161b22;
 --primary:#ffffff;
---accent:#ff7f27;
 --secondary-bg:#1c293a;
 --header-bg:#161b22;
 --header-text:#ffffff;
@@ -50,57 +49,6 @@ position:relative;
 header h1{
 margin:0;
 font-size:1.8rem;
-}
-
-.theme-toggle-container{
-position:absolute;
-right:1rem;
-top:1rem;
-}
-
-.toggle-switch{
-position:relative;
-display:inline-block;
-width:48px;
-height:24px;
-}
-
-.toggle-switch input{
-opacity:0;
-width:0;
-height:0;
-}
-
-.slider{
-position:absolute;
-cursor:pointer;
-top:0;
-left:0;
-right:0;
-bottom:0;
-background:#ccc;
-transition:.4s;
-border-radius:34px;
-}
-
-.slider:before{
-position:absolute;
-content:"";
-height:18px;
-width:18px;
-left:3px;
-bottom:3px;
-background:white;
-transition:.4s;
-border-radius:50%;
-}
-
-input:checked + .slider{
-background:var(--accent);
-}
-
-input:checked + .slider:before{
-transform:translateX(24px);
 }
 
 main{
@@ -193,7 +141,7 @@ overflow:auto;
 
 .listItem{
 display:grid;
-grid-template-columns:26px 1fr 45px;
+grid-template-columns:26px 1fr auto;
 align-items:center;
 background:var(--secondary-bg);
 padding:.4rem .5rem;
@@ -202,7 +150,6 @@ border-radius:6px;
 font-size:.85rem;
 gap:6px;
 word-break:break-all;
-position:relative;
 }
 
 .deleteBtn{
@@ -231,11 +178,13 @@ cursor:pointer;
 font-weight:bold;
 color:var(--primary);
 font-size:12px;
+position:relative;
 }
 
 .copyToast{
 position:absolute;
-right:50px;
+left:40px;
+top:-2px;
 background:#333;
 color:white;
 padding:3px 7px;
@@ -257,14 +206,6 @@ opacity:1;
 
 <header>
 <h1>Check Vehicle Registration</h1>
-
-<div class="theme-toggle-container">
-<label class="toggle-switch">
-<input type="checkbox" id="themeToggle">
-<span class="slider"></span>
-</label>
-</div>
-
 </header>
 
 <main>
@@ -285,7 +226,6 @@ opacity:1;
 </div>
 
 <div id="recentPanel" class="panel"></div>
-
 <div id="historyPanel" class="panel" style="display:none"></div>
 
 </div>
@@ -325,14 +265,14 @@ const toast=document.createElement("div");
 toast.className="copyToast";
 toast.textContent="Copied";
 
-btn.parentElement.appendChild(toast);
+btn.appendChild(toast);
 
 setTimeout(()=>toast.classList.add("show"),10);
 
 setTimeout(()=>{
 toast.classList.remove("show");
 setTimeout(()=>toast.remove(),200);
-},1000);
+},900);
 
 }
 
@@ -370,16 +310,27 @@ panel.innerHTML="";
 
 recent.forEach((r,i)=>{
 
-const div=document.createElement("div");
-div.className="listItem";
+const row=document.createElement("div");
+row.className="listItem";
 
-div.innerHTML=`
-<button class="deleteBtn" onclick="deleteRecent(${i})">✕</button>
-<span>${r}</span>
-<button class="copyBtn" onclick="copyRego('${r}',this)">Copy</button>
-`;
+const del=document.createElement("button");
+del.className="deleteBtn";
+del.textContent="✕";
+del.onclick=()=>{recent.splice(i,1);save();renderRecent();};
 
-panel.appendChild(div);
+const text=document.createElement("span");
+text.textContent=r;
+
+const copy=document.createElement("button");
+copy.className="copyBtn";
+copy.textContent="Copy";
+copy.onclick=()=>copyRego(r,copy);
+
+row.appendChild(del);
+row.appendChild(text);
+row.appendChild(copy);
+
+panel.appendChild(row);
 
 });
 
@@ -392,31 +343,30 @@ panel.innerHTML="";
 
 history.forEach((h,i)=>{
 
-const div=document.createElement("div");
-div.className="listItem";
+const row=document.createElement("div");
+row.className="listItem";
 
-div.innerHTML=`
-<button class="deleteBtn" onclick="deleteHistory(${i})">✕</button>
-<span>${h.date} — ${h.rego}</span>
-<button class="copyBtn" onclick="copyRego('${h.rego}',this)">Copy</button>
-`;
+const del=document.createElement("button");
+del.className="deleteBtn";
+del.textContent="✕";
+del.onclick=()=>{history.splice(i,1);save();renderHistory();};
 
-panel.appendChild(div);
+const text=document.createElement("span");
+text.textContent=`${h.date} — ${h.rego}`;
+
+const copy=document.createElement("button");
+copy.className="copyBtn";
+copy.textContent="Copy";
+copy.onclick=()=>copyRego(h.rego,copy);
+
+row.appendChild(del);
+row.appendChild(text);
+row.appendChild(copy);
+
+panel.appendChild(row);
 
 });
 
-}
-
-function deleteRecent(i){
-recent.splice(i,1);
-save();
-renderRecent();
-}
-
-function deleteHistory(i){
-history.splice(i,1);
-save();
-renderHistory();
 }
 
 function buildStates(rego){
@@ -475,27 +425,6 @@ document.querySelectorAll(".tab")[1].classList.add("active");
 
 renderRecent();
 renderHistory();
-
-const toggle=document.getElementById("themeToggle");
-
-function setTheme(mode){
-document.documentElement.setAttribute("data-theme",mode);
-localStorage.setItem("theme",mode);
-toggle.checked=(mode==="dark");
-}
-
-toggle.addEventListener("change",()=>{
-setTheme(toggle.checked?"dark":"light");
-});
-
-const saved=localStorage.getItem("theme");
-
-if(saved){
-setTheme(saved);
-}else{
-const dark=window.matchMedia("(prefers-color-scheme: dark)").matches;
-setTheme(dark?"dark":"light");
-}
 
 </script>
 
