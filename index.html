@@ -11,7 +11,7 @@
 --text:#1a1a1a;
 --card:#ffffff;
 --primary:#002855;
---accent:#ff7f27; /* orange highlight for history header */
+--accent:#ff7f27;
 --secondary-bg:#e6f0ff;
 --header-bg:#002855;
 --header-text:#ffffff;
@@ -166,7 +166,7 @@ font-weight:bold;
 font-size:1.1rem;
 margin-bottom:.5rem;
 text-align:center;
-color:var(--accent); /* orange highlight */
+color:var(--accent);
 }
 
 .listItem{
@@ -177,7 +177,7 @@ background:var(--secondary-bg);
 padding:.5rem .6rem;
 margin-bottom:.35rem;
 border-radius:6px;
-font-size:1rem; /* larger rego font for readability */
+font-size:1rem;
 gap:8px;
 word-break:break-all;
 }
@@ -291,7 +291,7 @@ showCopyToast(btn);
 }
 
 function addHistory(rego){
-rego=rego.toUpperCase(); // force uppercase
+rego=rego.toUpperCase();
 const d=new Date();
 const pad=n=>String(n).padStart(2,'0');
 history.unshift({
@@ -363,6 +363,7 @@ e.preventDefault();
 }
 });
 
+// Render initial states & history
 buildStates("");
 renderHistory();
 
