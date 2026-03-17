@@ -11,7 +11,7 @@
 --text:#1a1a1a;
 --card:#ffffff;
 --primary:#002855;
---accent:#ff7f27;
+--accent:#ff7f27; /* orange highlight for history header */
 --secondary-bg:#e6f0ff;
 --header-bg:#002855;
 --header-text:#ffffff;
@@ -25,6 +25,7 @@
 --secondary-bg:#1c293a;
 --header-bg:#161b22;
 --header-text:#ffffff;
+--accent:#ff7f27;
 }
 
 html,body{
@@ -150,7 +151,7 @@ color:white;
 }
 
 #historyPanel{
-width:460px;
+width:480px;
 background:var(--card);
 border:2px solid var(--primary);
 border-radius:10px;
@@ -162,10 +163,10 @@ overflow:auto;
 
 #historyHeader{
 font-weight:bold;
-font-size:1rem;
+font-size:1.1rem;
 margin-bottom:.5rem;
 text-align:center;
-color:var(--primary);
+color:var(--accent); /* orange highlight */
 }
 
 .listItem{
@@ -173,10 +174,10 @@ display:grid;
 grid-template-columns:26px 1fr auto;
 align-items:center;
 background:var(--secondary-bg);
-padding:.45rem .6rem;
+padding:.5rem .6rem;
 margin-bottom:.35rem;
 border-radius:6px;
-font-size:.85rem;
+font-size:1rem; /* larger rego font for readability */
 gap:8px;
 word-break:break-all;
 }
@@ -274,9 +275,7 @@ const toast=document.getElementById("copyToast");
 
 let history=JSON.parse(localStorage.getItem("regoHistory")||"[]");
 
-function save(){
-localStorage.setItem("regoHistory",JSON.stringify(history));
-}
+function save(){ localStorage.setItem("regoHistory",JSON.stringify(history)); }
 
 function showCopyToast(btn){
 const rect=btn.getBoundingClientRect();
@@ -287,7 +286,7 @@ setTimeout(()=>toast.classList.remove("show"),900);
 }
 
 function copyRego(rego,btn){
-navigator.clipboard.writeText(rego);
+navigator.clipboard.writeText(rego.toUpperCase());
 showCopyToast(btn);
 }
 
@@ -343,8 +342,8 @@ result.innerHTML=html;
 
 input.addEventListener("input",()=>{
 let val=input.value.trim().toUpperCase();
-if(!val) return;
 input.value=val;
+if(!val) return;
 navigator.clipboard.writeText(val);
 buildStates(val);
 });
@@ -355,12 +354,12 @@ if(e.key.length===1 && input.value.endsWith(" ")){
 const lastChar=e.key.toUpperCase();
 const mapping={"V":"VIC","N":"NSW","Q":"QLD","S":"SA","W":"WA","T":"TAS","A":"ACT","D":"NT","H":"NHVR"};
 const state=mapping[lastChar];
-if(state && input.value.trim().length>0){
+const regoVal=input.value.trim();
+if(state && regoVal.length>0){
 window.open(stateLinks[state],"_blank");
-addHistory(input.value.trim().toUpperCase());
+addHistory(regoVal.toUpperCase());
 input.value="";
 e.preventDefault();
-}
 }
 });
 
