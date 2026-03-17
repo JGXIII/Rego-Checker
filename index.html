@@ -226,24 +226,24 @@ cursor:pointer;
 font-weight:bold;
 color:var(--primary);
 font-size:12px;
-position:relative;
 }
 
-.copyToast{
-position:absolute;
-left:55px;
-top:-2px;
+/* Floating toast */
+
+#copyToast{
+position:fixed;
 background:#333;
 color:white;
-padding:3px 7px;
+padding:4px 8px;
 border-radius:6px;
 font-size:11px;
 opacity:0;
 transition:opacity .2s;
 pointer-events:none;
+z-index:9999;
 }
 
-.copyToast.show{
+#copyToast.show{
 opacity:1;
 }
 
@@ -288,6 +288,8 @@ opacity:1;
 
 </main>
 
+<div id="copyToast">Copied</div>
+
 <script>
 
 const stateLinks={
@@ -304,6 +306,7 @@ NHVR:"https://www.service.nhvr.gov.au/#page=informationHub/nHVASAVMSearch"
 
 const input=document.getElementById("regoInput");
 const result=document.getElementById("result");
+const toast=document.getElementById("copyToast");
 
 let recent=JSON.parse(localStorage.getItem("recentRegos")||"[]");
 let history=JSON.parse(localStorage.getItem("regoHistory")||"[]");
@@ -315,17 +318,15 @@ localStorage.setItem("regoHistory",JSON.stringify(history));
 
 function showCopyToast(btn){
 
-const toast=document.createElement("div");
-toast.className="copyToast";
-toast.textContent="Copied";
+const rect=btn.getBoundingClientRect();
 
-btn.appendChild(toast);
+toast.style.left=(rect.right+8)+"px";
+toast.style.top=(rect.top)+"px";
 
-setTimeout(()=>toast.classList.add("show"),10);
+toast.classList.add("show");
 
 setTimeout(()=>{
 toast.classList.remove("show");
-setTimeout(()=>toast.remove(),200);
 },900);
 
 }
