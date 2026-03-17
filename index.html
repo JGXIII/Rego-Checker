@@ -35,7 +35,6 @@ height:100%;
 background:var(--bg);
 color:var(--text);
 font-family:Arial,Helvetica,sans-serif;
-overflow:hidden;
 }
 
 header{
@@ -51,19 +50,68 @@ margin:0;
 font-size:1.8rem;
 }
 
+.theme-toggle-container{
+position:absolute;
+right:15px;
+top:15px;
+}
+
+.toggle-switch{
+position:relative;
+display:inline-block;
+width:48px;
+height:24px;
+}
+
+.toggle-switch input{
+opacity:0;
+width:0;
+height:0;
+}
+
+.slider{
+position:absolute;
+cursor:pointer;
+top:0;
+left:0;
+right:0;
+bottom:0;
+background:#ccc;
+transition:.4s;
+border-radius:34px;
+}
+
+.slider:before{
+position:absolute;
+content:"";
+height:18px;
+width:18px;
+left:3px;
+bottom:3px;
+background:white;
+transition:.4s;
+border-radius:50%;
+}
+
+input:checked + .slider{
+background:var(--accent);
+}
+
+input:checked + .slider:before{
+transform:translateX(24px);
+}
+
 main{
 display:flex;
 justify-content:center;
 align-items:flex-start;
 padding:1rem;
 gap:2rem;
-height:calc(100% - 80px);
-box-sizing:border-box;
 }
 
 #leftPanel{
 flex:1;
-max-width:620px;
+max-width:650px;
 }
 
 input[type="text"]{
@@ -103,13 +151,13 @@ color:white;
 }
 
 #sidePanel{
-width:360px;
+width:460px;
 background:var(--card);
 border:2px solid var(--primary);
 border-radius:10px;
 padding:0.8rem;
 box-sizing:border-box;
-height:100%;
+height:80vh;
 display:flex;
 flex-direction:column;
 }
@@ -144,11 +192,11 @@ display:grid;
 grid-template-columns:26px 1fr auto;
 align-items:center;
 background:var(--secondary-bg);
-padding:.4rem .5rem;
+padding:.45rem .6rem;
 margin-bottom:.35rem;
 border-radius:6px;
 font-size:.85rem;
-gap:6px;
+gap:8px;
 word-break:break-all;
 }
 
@@ -183,7 +231,7 @@ position:relative;
 
 .copyToast{
 position:absolute;
-left:40px;
+left:55px;
 top:-2px;
 background:#333;
 color:white;
@@ -206,13 +254,21 @@ opacity:1;
 
 <header>
 <h1>Check Vehicle Registration</h1>
+
+<div class="theme-toggle-container">
+<label class="toggle-switch">
+<input type="checkbox" id="themeToggle">
+<span class="slider"></span>
+</label>
+</div>
+
 </header>
 
 <main>
 
 <div id="leftPanel">
 
-<input id="regoInput" type="text" placeholder="ENTER REGO HERE">
+<input id="regoInput" type="text" placeholder="ENTER REGO OR VIN HERE">
 
 <div id="result"></div>
 
@@ -245,8 +301,6 @@ ACT:"https://rego.act.gov.au/regosoawicket/public/reg/FindRegistrationPage",
 NT:"https://nt.gov.au/driving/rego/existing-nt-registration/rego-check",
 NHVR:"https://www.service.nhvr.gov.au/#page=informationHub/nHVASAVMSearch"
 };
-
-const stateAbbrev={V:"VIC",N:"NSW",Q:"QLD",S:"SA",W:"WA",T:"TAS",A:"ACT",X:"NT",H:"NHVR"};
 
 const input=document.getElementById("regoInput");
 const result=document.getElementById("result");
@@ -385,23 +439,12 @@ result.innerHTML=html;
 input.addEventListener("input",()=>{
 
 let val=input.value.trim().toUpperCase();
-let [rego,code]=val.split(" ");
 
-if(!rego) return;
+if(!val) return;
 
-navigator.clipboard.writeText(rego);
+navigator.clipboard.writeText(val);
 
-if(code && stateAbbrev[code]){
-
-let state=stateAbbrev[code];
-
-window.open(stateLinks[state],"_blank");
-
-addRecent(rego);
-
-input.value="";
-
-}
+buildStates(val);
 
 });
 
@@ -425,6 +468,27 @@ document.querySelectorAll(".tab")[1].classList.add("active");
 
 renderRecent();
 renderHistory();
+
+const toggle=document.getElementById("themeToggle");
+
+function setTheme(mode){
+document.documentElement.setAttribute("data-theme",mode);
+localStorage.setItem("theme",mode);
+toggle.checked=(mode==="dark");
+}
+
+toggle.addEventListener("change",()=>{
+setTheme(toggle.checked?"dark":"light");
+});
+
+const saved=localStorage.getItem("theme");
+
+if(saved){
+setTheme(saved);
+}else{
+const dark=window.matchMedia("(prefers-color-scheme: dark)").matches;
+setTheme(dark?"dark":"light");
+}
 
 </script>
 
