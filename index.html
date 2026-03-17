@@ -160,6 +160,14 @@ height:80vh;
 overflow:auto;
 }
 
+#historyHeader{
+font-weight:bold;
+font-size:1rem;
+margin-bottom:.5rem;
+text-align:center;
+color:var(--primary);
+}
+
 .listItem{
 display:grid;
 grid-template-columns:26px 1fr auto;
@@ -239,7 +247,9 @@ opacity:1;
 <div id="result"></div>
 </div>
 
-<div id="historyPanel"></div>
+<div id="historyPanel">
+<div id="historyHeader">History</div>
+</div>
 </main>
 
 <div id="copyToast">Copied</div>
@@ -282,6 +292,7 @@ showCopyToast(btn);
 }
 
 function addHistory(rego){
+rego=rego.toUpperCase(); // force uppercase
 const d=new Date();
 const pad=n=>String(n).padStart(2,'0');
 history.unshift({
@@ -294,7 +305,7 @@ renderHistory();
 }
 
 function renderHistory(){
-historyPanel.innerHTML="";
+historyPanel.innerHTML='<div id="historyHeader">History</div>';
 history.forEach((h,i)=>{
 const row=document.createElement("div");
 row.className="listItem";
@@ -321,6 +332,7 @@ historyPanel.appendChild(row);
 }
 
 function buildStates(rego){
+rego=rego.toUpperCase();
 let html="<ul>";
 Object.entries(stateLinks).forEach(([state,url])=>{
 html+=`<li onclick="window.open('${url}','_blank');addHistory('${rego}');input.value='';">${state}</li>`;
@@ -332,19 +344,20 @@ result.innerHTML=html;
 input.addEventListener("input",()=>{
 let val=input.value.trim().toUpperCase();
 if(!val) return;
+input.value=val;
 navigator.clipboard.writeText(val);
 buildStates(val);
 });
 
 // Keyboard shortcut: space + letter
 input.addEventListener("keydown",(e)=>{
-if(e.key.length===1 && e.target.value.endsWith(" ")){
+if(e.key.length===1 && input.value.endsWith(" ")){
 const lastChar=e.key.toUpperCase();
 const mapping={"V":"VIC","N":"NSW","Q":"QLD","S":"SA","W":"WA","T":"TAS","A":"ACT","D":"NT","H":"NHVR"};
 const state=mapping[lastChar];
 if(state && input.value.trim().length>0){
 window.open(stateLinks[state],"_blank");
-addHistory(input.value.trim());
+addHistory(input.value.trim().toUpperCase());
 input.value="";
 e.preventDefault();
 }
