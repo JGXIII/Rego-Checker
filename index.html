@@ -202,6 +202,7 @@ border-radius:6px;
 font-size:.85rem;
 gap:6px;
 word-break:break-all;
+position:relative;
 }
 
 .deleteBtn{
@@ -232,23 +233,20 @@ color:var(--primary);
 font-size:12px;
 }
 
-.toast{
-position:fixed;
-bottom:25px;
-left:50%;
-transform:translateX(-50%);
+.copyToast{
+position:absolute;
+right:50px;
 background:#333;
 color:white;
-padding:8px 14px;
-border-radius:8px;
-font-size:13px;
+padding:3px 7px;
+border-radius:6px;
+font-size:11px;
 opacity:0;
+transition:opacity .2s;
 pointer-events:none;
-transition:opacity .3s;
-z-index:9999;
 }
 
-.toast.show{
+.copyToast.show{
 opacity:1;
 }
 
@@ -294,8 +292,6 @@ opacity:1;
 
 </main>
 
-<div id="toast" class="toast">Rego copied</div>
-
 <script>
 
 const stateLinks={
@@ -323,10 +319,29 @@ localStorage.setItem("recentRegos",JSON.stringify(recent));
 localStorage.setItem("regoHistory",JSON.stringify(history));
 }
 
-function showToast(){
-const toast=document.getElementById("toast");
-toast.classList.add("show");
-setTimeout(()=>{toast.classList.remove("show");},1200);
+function showCopyToast(btn){
+
+const toast=document.createElement("div");
+toast.className="copyToast";
+toast.textContent="Copied";
+
+btn.parentElement.appendChild(toast);
+
+setTimeout(()=>toast.classList.add("show"),10);
+
+setTimeout(()=>{
+toast.classList.remove("show");
+setTimeout(()=>toast.remove(),200);
+},1000);
+
+}
+
+function copyRego(rego,btn){
+
+navigator.clipboard.writeText(rego);
+
+showCopyToast(btn);
+
 }
 
 function addRecent(rego){
@@ -361,7 +376,7 @@ div.className="listItem";
 div.innerHTML=`
 <button class="deleteBtn" onclick="deleteRecent(${i})">✕</button>
 <span>${r}</span>
-<button class="copyBtn" onclick="navigator.clipboard.writeText('${r}');showToast();">Copy</button>
+<button class="copyBtn" onclick="copyRego('${r}',this)">Copy</button>
 `;
 
 panel.appendChild(div);
@@ -383,7 +398,7 @@ div.className="listItem";
 div.innerHTML=`
 <button class="deleteBtn" onclick="deleteHistory(${i})">✕</button>
 <span>${h.date} — ${h.rego}</span>
-<button class="copyBtn" onclick="navigator.clipboard.writeText('${h.rego}');showToast();">Copy</button>
+<button class="copyBtn" onclick="copyRego('${h.rego}',this)">Copy</button>
 `;
 
 panel.appendChild(div);
