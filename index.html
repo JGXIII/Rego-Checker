@@ -4,339 +4,542 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Check Vehicle Registration</title>
-<link rel="icon" href="https://i.imgur.com/tM2lY0B.png">
+
 <style>
+
 :root{
-  --bg:#f7f7f7;
-  --text:#1a1a1a;
-  --card:#ffffff;
-  --primary:#002855;
-  --accent:#ff7f27;
-  --secondary-bg:#e6f0ff;
-  --header-bg:#002855;
-  --header-text:#ffffff;
+--bg:#f7f7f7;
+--text:#1a1a1a;
+--card:#ffffff;
+--primary:#002855;
+--accent:#ff7f27;
+--secondary-bg:#e6f0ff;
+--header-bg:#002855;
+--header-text:#ffffff;
 }
+
 [data-theme="dark"]{
-  --bg:#0d1117;
-  --text:#f0f0f0;
-  --card:#161b22;
-  --primary:#ffffff;
-  --accent:#ff7f27;
-  --secondary-bg:#1c293a;
-  --header-bg:#161b22;
-  --header-text:#ffffff;
+--bg:#0d1117;
+--text:#f0f0f0;
+--card:#161b22;
+--primary:#ffffff;
+--accent:#ff7f27;
+--secondary-bg:#1c293a;
+--header-bg:#161b22;
+--header-text:#ffffff;
 }
+
 html,body{
-  margin:0;
-  padding:0;
-  height:100%;
-  background:var(--bg);
-  color:var(--text);
-  font-family:Arial,Helvetica,sans-serif;
-  overflow:hidden;
+margin:0;
+padding:0;
+height:100%;
+background:var(--bg);
+color:var(--text);
+font-family:Arial,Helvetica,sans-serif;
+overflow:hidden;
 }
+
 header{
-  background:var(--header-bg);
-  color:var(--header-text);
-  padding:1rem;
-  text-align:center;
-  position:relative;
+background:var(--header-bg);
+color:var(--header-text);
+padding:1rem;
+text-align:center;
+position:relative;
 }
+
 header h1{
-  margin:0;
-  font-size:1.8rem;
+margin:0;
+font-size:1.8rem;
 }
+
 .theme-toggle-container{
-  position:absolute;
-  right:1rem;
-  top:1rem;
+position:absolute;
+right:1rem;
+top:1rem;
 }
+
 .toggle-switch{
-  position:relative;
-  display:inline-block;
-  width:48px;
-  height:24px;
+position:relative;
+display:inline-block;
+width:48px;
+height:24px;
 }
-.toggle-switch input{opacity:0;width:0;height:0;}
+
+.toggle-switch input{
+opacity:0;
+width:0;
+height:0;
+}
+
 .slider{
-  position:absolute;
-  cursor:pointer;
-  top:0;left:0;right:0;bottom:0;
-  background:#ccc;
-  transition:.4s;
-  border-radius:34px;
+position:absolute;
+cursor:pointer;
+top:0;
+left:0;
+right:0;
+bottom:0;
+background:#ccc;
+transition:.4s;
+border-radius:34px;
 }
+
 .slider:before{
-  position:absolute;
-  content:"";
-  height:18px;width:18px;
-  left:3px;bottom:3px;
-  background:white;
-  transition:.4s;
-  border-radius:50%;
+position:absolute;
+content:"";
+height:18px;
+width:18px;
+left:3px;
+bottom:3px;
+background:white;
+transition:.4s;
+border-radius:50%;
 }
-input:checked+.slider{background:var(--accent);}
-input:checked+.slider:before{transform:translateX(24px);}
+
+input:checked + .slider{
+background:var(--accent);
+}
+
+input:checked + .slider:before{
+transform:translateX(24px);
+}
 
 main{
-  display:flex;
-  justify-content:center;
-  align-items:flex-start;
-  padding:1rem;
-  gap:2rem;
-  height:calc(100% - 80px);
-  box-sizing:border-box;
+display:flex;
+justify-content:center;
+align-items:flex-start;
+padding:1rem;
+gap:2rem;
+height:calc(100% - 80px);
+box-sizing:border-box;
 }
-#leftPanel{flex:1;max-width:620px;}
+
+#leftPanel{
+flex:1;
+max-width:620px;
+}
+
 input[type="text"]{
-  width:100%;
-  padding:1rem;
-  font-size:1.2rem;
-  border:2px solid var(--primary);
-  border-radius:8px;
-  background:var(--card);
-  color:var(--text);
-  font-weight:bold;
-  text-transform:uppercase;
+width:100%;
+padding:1rem;
+font-size:1.2rem;
+border:2px solid var(--primary);
+border-radius:8px;
+background:var(--card);
+color:var(--text);
+font-weight:bold;
+text-transform:uppercase;
 }
 
 #result ul{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:0.8rem;
-  padding:0;
-  list-style:none;
-  margin-top:1rem;
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:0.8rem;
+padding:0;
+list-style:none;
+margin-top:1rem;
 }
+
 #result li{
-  background:var(--secondary-bg);
-  color:var(--primary);
-  font-weight:bold;
-  padding:0.7rem;
-  border-radius:8px;
-  text-align:center;
-  cursor:pointer;
+background:var(--secondary-bg);
+color:var(--primary);
+font-weight:bold;
+padding:0.7rem;
+border-radius:8px;
+text-align:center;
+cursor:pointer;
 }
+
 #result li:hover{
-  background:var(--accent);
-  color:white;
+background:var(--accent);
+color:white;
 }
 
 #sidePanel{
-  width:340px;
-  background:var(--card);
-  border:2px solid var(--primary);
-  border-radius:10px;
-  padding:0.8rem;
-  box-sizing:border-box;
-  height:100%;
-  display:flex;
-  flex-direction:column;
+width:360px;
+background:var(--card);
+border:2px solid var(--primary);
+border-radius:10px;
+padding:0.8rem;
+box-sizing:border-box;
+height:100%;
+display:flex;
+flex-direction:column;
 }
+
 .tabs{
-  display:flex;
-  border-bottom:2px solid var(--accent);
-  margin-bottom:.5rem;
+display:flex;
+border-bottom:2px solid var(--accent);
+margin-bottom:.5rem;
 }
+
 .tab{
-  flex:1;
-  padding:.4rem;
-  text-align:center;
-  cursor:pointer;
-  font-weight:bold;
+flex:1;
+padding:.4rem;
+text-align:center;
+cursor:pointer;
+font-weight:bold;
 }
-.tab.active{background:var(--accent);color:white;border-radius:6px 6px 0 0;}
+
+.tab.active{
+background:var(--accent);
+color:white;
+border-radius:6px 6px 0 0;
+}
+
 .panel{
-  flex:1;
-  overflow:auto;
+flex:1;
+overflow:auto;
 }
+
 .listItem{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  background:var(--secondary-bg);
-  padding:.4rem .5rem;
-  margin-bottom:.35rem;
-  border-radius:6px;
-  font-size:.85rem;
+display:flex;
+align-items:center;
+justify-content:space-between;
+background:var(--secondary-bg);
+padding:.4rem .5rem;
+margin-bottom:.35rem;
+border-radius:6px;
+font-size:.85rem;
 }
+
 .copyBtn{
-  background:none;
-  border:none;
-  cursor:pointer;
-  font-weight:bold;
-  display:flex;
-  align-items:center;
-  gap:4px;
-  color:var(--primary);
+background:none;
+border:none;
+cursor:pointer;
+font-weight:bold;
+display:flex;
+align-items:center;
+gap:4px;
+color:var(--primary);
 }
-.copyBtn svg{width:14px;height:14px;}
+
+.copyBtn svg{
+width:14px;
+height:14px;
+}
+
 .historyRow{
-  display:grid;
-  grid-template-columns:120px 1fr;
-  gap:4px;
-  margin-bottom:4px;
+display:grid;
+grid-template-columns:170px 1fr 20px;
+gap:4px;
+margin-bottom:4px;
+align-items:center;
 }
+
 .historyRow input{
-  font-size:.8rem;
-  padding:.25rem;
-  border-radius:4px;
-  border:1px solid #999;
+font-size:.8rem;
+padding:.25rem;
+border-radius:4px;
+border:1px solid #999;
 }
-@media(max-width:800px){
-  main{flex-direction:column;overflow:auto}
-  #sidePanel{width:100%;height:500px}
-  #result ul{grid-template-columns:1fr}
+
+.deleteBtn{
+border:none;
+background:transparent;
+cursor:pointer;
+font-weight:bold;
+color:#cc0000;
 }
+
+.clearBtn{
+background:var(--accent);
+border:none;
+padding:5px 8px;
+border-radius:6px;
+color:white;
+cursor:pointer;
+font-size:12px;
+margin-bottom:6px;
+}
+
 </style>
 </head>
+
 <body>
+
 <header>
 <h1>Check Vehicle Registration</h1>
+
 <div class="theme-toggle-container">
 <label class="toggle-switch">
 <input type="checkbox" id="themeToggle">
 <span class="slider"></span>
 </label>
 </div>
+
 </header>
+
 <main>
+
 <div id="leftPanel">
+
 <input id="regoInput" type="text" placeholder="ENTER REGO HERE">
+
 <div id="result"></div>
+
 </div>
+
 <div id="sidePanel">
+
 <div class="tabs">
 <div class="tab active" onclick="switchTab('recent')">Recent</div>
 <div class="tab" onclick="switchTab('history')">History</div>
 </div>
+
 <div id="recentPanel" class="panel"></div>
-<div id="historyPanel" class="panel" style="display:none"></div>
+
+<div id="historyPanel" class="panel" style="display:none">
+
+<button class="clearBtn" onclick="clearHistory()">Clear History</button>
+
+<div id="historyList"></div>
+
 </div>
+
+</div>
+
 </main>
+
 <script>
+
 const stateLinks={
-  VIC:"https://www.vicroads.vic.gov.au/registration/buy-sell-or-transfer-a-vehicle/check-vehicle-registration/vehicle-registration-enquiry",
-  NSW:"https://check-registration.service.nsw.gov.au/?isLoginRequired=true",
-  QLD:"https://www.service.transport.qld.gov.au/checkrego/application/VehicleSearch.xhtml",
-  SA:"https://account.ezyreg.sa.gov.au/account/check-registration.htm",
-  WA:"https://online.transport.wa.gov.au/webExternal/registration/",
-  TAS:"https://www.transport.tas.gov.au/MRSWebInterface/public/regoLookup/registrationLookup.xhtml",
-  ACT:"https://rego.act.gov.au/regosoawicket/public/reg/FindRegistrationPage",
-  NT:"https://nt.gov.au/driving/rego/existing-nt-registration/rego-check",
-  NHVR:"https://www.service.nhvr.gov.au/#page=informationHub/nHVASAVMSearch"
+VIC:"https://www.vicroads.vic.gov.au/registration/buy-sell-or-transfer-a-vehicle/check-vehicle-registration/vehicle-registration-enquiry",
+NSW:"https://check-registration.service.nsw.gov.au/?isLoginRequired=true",
+QLD:"https://www.service.transport.qld.gov.au/checkrego/application/VehicleSearch.xhtml",
+SA:"https://account.ezyreg.sa.gov.au/account/check-registration.htm",
+WA:"https://online.transport.wa.gov.au/webExternal/registration/",
+TAS:"https://www.transport.tas.gov.au/MRSWebInterface/public/regoLookup/registrationLookup.xhtml",
+ACT:"https://rego.act.gov.au/regosoawicket/public/reg/FindRegistrationPage",
+NT:"https://nt.gov.au/driving/rego/existing-nt-registration/rego-check",
+NHVR:"https://www.service.nhvr.gov.au/#page=informationHub/nHVASAVMSearch"
 };
-const stateAbbrev={V:"VIC",N:"NSW",Q:"QLD",S:"SA",W:"WA",T:"TAS",A:"ACT",X:"NT",H:"NHVR"};
+
+const stateAbbrev={
+V:"VIC",
+N:"NSW",
+Q:"QLD",
+S:"SA",
+W:"WA",
+T:"TAS",
+A:"ACT",
+X:"NT",
+H:"NHVR"
+};
 
 const input=document.getElementById("regoInput");
 const result=document.getElementById("result");
+
 let recent=JSON.parse(localStorage.getItem("recentRegos")||"[]");
 let history=JSON.parse(localStorage.getItem("regoHistory")||"[]");
 
 function save(){
-  localStorage.setItem("recentRegos",JSON.stringify(recent));
-  localStorage.setItem("regoHistory",JSON.stringify(history));
+localStorage.setItem("recentRegos",JSON.stringify(recent));
+localStorage.setItem("regoHistory",JSON.stringify(history));
 }
 
 function addRecent(rego){
-  recent=recent.filter(r=>r!==rego);
-  recent.unshift(rego);
-  if(recent.length>20) recent.pop();
-  const d=new Date();
-  const pad=n=>String(n).padStart(2,'0');
-  history.unshift({
-    rego:rego,
-    date:`${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`,
-    notes:""
-  });
-  save();
-  renderRecent();
-  renderHistory();
+
+recent=recent.filter(r=>r!==rego);
+recent.unshift(rego);
+
+if(recent.length>20) recent.pop();
+
+const d=new Date();
+const pad=n=>String(n).padStart(2,'0');
+
+history.unshift({
+rego:rego,
+date:`${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`,
+notes:""
+});
+
+save();
+
+renderRecent();
+renderHistory();
 }
 
 function renderRecent(){
-  const panel=document.getElementById("recentPanel");
-  panel.innerHTML="";
-  recent.forEach(r=>{
-    const div=document.createElement("div");
-    div.className="listItem";
-    div.innerHTML=`<span>${r}</span><button class="copyBtn" onclick="navigator.clipboard.writeText('${r}')"><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'><rect x='9' y='9' width='13' height='13' rx='2'></rect><path d='M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1'></path></svg>Copy</button>`;
-    panel.appendChild(div);
-  });
+
+const panel=document.getElementById("recentPanel");
+panel.innerHTML="";
+
+recent.forEach(r=>{
+
+const div=document.createElement("div");
+
+div.className="listItem";
+
+div.innerHTML=`
+<span>${r}</span>
+<button class="copyBtn" onclick="navigator.clipboard.writeText('${r}')">
+Copy
+</button>
+`;
+
+panel.appendChild(div);
+
+});
+
 }
 
 function renderHistory(){
-  const panel=document.getElementById("historyPanel");
-  panel.innerHTML="";
-  history.forEach((h,i)=>{
-    const row=document.createElement("div");
-    row.className="historyRow";
-    const date=document.createElement("div");
-    date.textContent=h.date;
-    const note=document.createElement("input");
-    note.value=h.rego+" - "+h.notes;
-    note.onchange=()=>{history[i].notes=note.value.replace(h.rego+" - ",""); save();};
-    row.appendChild(date);
-    row.appendChild(note);
-    panel.appendChild(row);
-  });
+
+const panel=document.getElementById("historyList");
+
+panel.innerHTML="";
+
+history.forEach((h,i)=>{
+
+const row=document.createElement("div");
+
+row.className="historyRow";
+
+const date=document.createElement("div");
+
+date.textContent=h.date;
+
+const note=document.createElement("input");
+
+note.value=h.rego+" - "+h.notes;
+
+note.onchange=()=>{
+history[i].notes=note.value.replace(h.rego+" - ","");
+save();
+};
+
+const del=document.createElement("button");
+
+del.textContent="✕";
+
+del.className="deleteBtn";
+
+del.onclick=()=>{
+history.splice(i,1);
+save();
+renderHistory();
+};
+
+row.appendChild(date);
+row.appendChild(note);
+row.appendChild(del);
+
+panel.appendChild(row);
+
+});
+
+}
+
+function clearHistory(){
+
+if(confirm("Clear all history?")){
+
+history=[];
+save();
+renderHistory();
+
+}
+
 }
 
 function buildStates(rego){
-  let html="<ul>";
-  Object.entries(stateLinks).forEach(([state,url])=>{
-    html+=`<li onclick="window.open('${url}','_blank');addRecent('${rego}');input.value='';">${state}</li>`;
-  });
-  html+="</ul>";
-  result.innerHTML=html;
+
+let html="<ul>";
+
+Object.entries(stateLinks).forEach(([state,url])=>{
+
+html+=`<li onclick="window.open('${url}','_blank');addRecent('${rego}');input.value='';">${state}</li>`;
+
+});
+
+html+="</ul>";
+
+result.innerHTML=html;
+
 }
 
 input.addEventListener("input",()=>{
-  let val=input.value.trim().toUpperCase();
-  let [rego,code]=val.split(" ");
-  if(!rego||rego.length<1){return}
-  navigator.clipboard.writeText(rego);
-  if(code&&stateAbbrev[code]){
-    let state=stateAbbrev[code];
-    window.open(stateLinks[state],"_blank");
-    addRecent(rego);
-    input.value="";
-    return;
-  }
+
+let val=input.value.trim().toUpperCase();
+
+let [rego,code]=val.split(" ");
+
+if(!rego) return;
+
+navigator.clipboard.writeText(rego);
+
+if(code && stateAbbrev[code]){
+
+let state=stateAbbrev[code];
+
+window.open(stateLinks[state],"_blank");
+
+addRecent(rego);
+
+input.value="";
+
+}
+
 });
 
 buildStates("");
 
 function switchTab(tab){
-  document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
-  if(tab==="recent"){
-    document.getElementById("recentPanel").style.display="block";
-    document.getElementById("historyPanel").style.display="none";
-    document.querySelectorAll(".tab")[0].classList.add("active");
-  }else{
-    document.getElementById("recentPanel").style.display="none";
-    document.getElementById("historyPanel").style.display="block";
-    document.querySelectorAll(".tab")[1].classList.add("active");
-  }
+
+document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
+
+if(tab==="recent"){
+
+document.getElementById("recentPanel").style.display="block";
+document.getElementById("historyPanel").style.display="none";
+document.querySelectorAll(".tab")[0].classList.add("active");
+
+}else{
+
+document.getElementById("recentPanel").style.display="none";
+document.getElementById("historyPanel").style.display="block";
+document.querySelectorAll(".tab")[1].classList.add("active");
+
+}
+
 }
 
 renderRecent();
 renderHistory();
 
-// Theme toggle
 const toggle=document.getElementById("themeToggle");
+
 function setTheme(mode){
-  document.documentElement.setAttribute("data-theme",mode);
-  localStorage.setItem("theme",mode);
-  toggle.checked=mode==="dark";
+
+document.documentElement.setAttribute("data-theme",mode);
+
+localStorage.setItem("theme",mode);
+
+toggle.checked=(mode==="dark");
+
 }
-toggle.addEventListener("change",()=>{setTheme(toggle.checked?"dark":"light");});
+
+toggle.addEventListener("change",()=>{
+
+setTheme(toggle.checked?"dark":"light");
+
+});
+
 const saved=localStorage.getItem("theme");
-if(saved) setTheme(saved);
-else{
-  const dark=window.matchMedia("(prefers-color-scheme: dark)").matches;
-  setTheme(dark?"dark":"light");
+
+if(saved){
+
+setTheme(saved);
+
+}else{
+
+const dark=window.matchMedia("(prefers-color-scheme: dark)").matches;
+
+setTheme(dark?"dark":"light");
+
 }
+
 </script>
+
 </body>
 </html>
