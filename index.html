@@ -192,42 +192,20 @@ overflow:auto;
 }
 
 .listItem{
-display:flex;
+display:grid;
+grid-template-columns:26px 1fr 45px;
 align-items:center;
-justify-content:space-between;
 background:var(--secondary-bg);
 padding:.4rem .5rem;
 margin-bottom:.35rem;
 border-radius:6px;
 font-size:.85rem;
-}
-
-.copyBtn{
-background:none;
-border:none;
-cursor:pointer;
-font-weight:bold;
-color:var(--primary);
-}
-
-.historyRow{
-display:grid;
-grid-template-columns:170px 1fr 60px 24px;
-gap:4px;
-margin-bottom:4px;
-align-items:center;
-}
-
-.historyRow input{
-font-size:.8rem;
-padding:.25rem;
-border-radius:4px;
-border:1px solid #999;
+gap:6px;
 }
 
 .deleteBtn{
-width:20px;
-height:20px;
+width:18px;
+height:18px;
 border-radius:50%;
 border:none;
 background:#d33;
@@ -237,10 +215,20 @@ cursor:pointer;
 display:flex;
 align-items:center;
 justify-content:center;
+font-size:12px;
 }
 
 .deleteBtn:hover{
 background:#ff0000;
+}
+
+.copyBtn{
+background:none;
+border:none;
+cursor:pointer;
+font-weight:bold;
+color:var(--primary);
+font-size:12px;
 }
 
 </style>
@@ -323,8 +311,7 @@ const pad=n=>String(n).padStart(2,'0');
 
 history.unshift({
 rego:rego,
-date:`${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`,
-notes:""
+date:`${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`
 });
 
 save();
@@ -337,12 +324,13 @@ function renderRecent(){
 const panel=document.getElementById("recentPanel");
 panel.innerHTML="";
 
-recent.forEach(r=>{
+recent.forEach((r,i)=>{
 
 const div=document.createElement("div");
 div.className="listItem";
 
 div.innerHTML=`
+<button class="deleteBtn" onclick="deleteRecent(${i})">✕</button>
 <span>${r}</span>
 <button class="copyBtn" onclick="navigator.clipboard.writeText('${r}')">Copy</button>
 `;
@@ -360,44 +348,31 @@ panel.innerHTML="";
 
 history.forEach((h,i)=>{
 
-const row=document.createElement("div");
-row.className="historyRow";
+const div=document.createElement("div");
+div.className="listItem";
 
-const date=document.createElement("div");
-date.textContent=h.date;
+div.innerHTML=`
+<button class="deleteBtn" onclick="deleteHistory(${i})">✕</button>
+<span>${h.date} — ${h.rego}</span>
+<button class="copyBtn" onclick="navigator.clipboard.writeText('${h.rego}')">Copy</button>
+`;
 
-const note=document.createElement("input");
-note.value=h.rego+" - "+h.notes;
-
-note.onchange=()=>{
-history[i].notes=note.value.replace(h.rego+" - ","");
-save();
-};
-
-const copy=document.createElement("button");
-copy.textContent="Copy";
-copy.className="copyBtn";
-copy.onclick=()=>navigator.clipboard.writeText(h.rego);
-
-const del=document.createElement("button");
-del.textContent="✕";
-del.className="deleteBtn";
-
-del.onclick=()=>{
-history.splice(i,1);
-save();
-renderHistory();
-};
-
-row.appendChild(date);
-row.appendChild(note);
-row.appendChild(copy);
-row.appendChild(del);
-
-panel.appendChild(row);
+panel.appendChild(div);
 
 });
 
+}
+
+function deleteRecent(i){
+recent.splice(i,1);
+save();
+renderRecent();
+}
+
+function deleteHistory(i){
+history.splice(i,1);
+save();
+renderHistory();
 }
 
 function buildStates(rego){
@@ -423,10 +398,15 @@ if(!rego) return;
 navigator.clipboard.writeText(rego);
 
 if(code && stateAbbrev[code]){
+
 let state=stateAbbrev[code];
+
 window.open(stateLinks[state],"_blank");
+
 addRecent(rego);
+
 input.value="";
+
 }
 
 });
