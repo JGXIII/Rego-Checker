@@ -163,7 +163,7 @@ overflow:auto;
 
 #historyHeader{
 font-weight:bold;
-font-size:1.1rem;
+font-size:1.2rem;
 margin-bottom:.5rem;
 text-align:center;
 color:var(--accent);
@@ -177,7 +177,7 @@ background:var(--secondary-bg);
 padding:.5rem .6rem;
 margin-bottom:.35rem;
 border-radius:6px;
-font-size:1rem;
+font-size:1.1rem;
 gap:8px;
 word-break:break-all;
 }
@@ -330,6 +330,7 @@ historyPanel.appendChild(row);
 });
 }
 
+// Build state buttons
 function buildStates(rego){
 rego=rego.toUpperCase();
 let html="<ul>";
@@ -340,15 +341,15 @@ html+="</ul>";
 result.innerHTML=html;
 }
 
+// Input events
 input.addEventListener("input",()=>{
 let val=input.value.trim().toUpperCase();
 input.value=val;
-if(!val) return;
 navigator.clipboard.writeText(val);
 buildStates(val);
 });
 
-// Keyboard shortcut: space + letter
+// Keyboard shortcut space + letter
 input.addEventListener("keydown",(e)=>{
 if(e.key.length===1 && input.value.endsWith(" ")){
 const lastChar=e.key.toUpperCase();
@@ -363,7 +364,7 @@ e.preventDefault();
 }
 });
 
-// Render initial states & history
+// Initial render
 buildStates("");
 renderHistory();
 
@@ -379,7 +380,6 @@ const saved=localStorage.getItem("theme");
 if(saved){setTheme(saved);}else{
 setTheme(window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light");
 }
-
 </script>
 
 </body>
