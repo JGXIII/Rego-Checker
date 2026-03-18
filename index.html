@@ -3,13 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Vehicle Rego Search Pro</title>
+<title>Check Vehicle Registration</title>
 <style>
 :root{
     --bg:#f7f7f7; --text:#1a1a1a; --card:#ffffff;
     --primary:#002855; --accent:#ff7f27; --secondary-bg:#e6f0ff;
     --header-bg:#002855; --header-text:#ffffff;
-    --success: #28a745;
 }
 [data-theme="dark"]{
     --bg:#0d1117; --text:#f0f0f0; --card:#161b22;
@@ -23,7 +22,7 @@ header{ background:var(--header-bg); color:var(--header-text); padding:1rem; tex
 
 main{ display:flex; justify-content:center; padding:1.5rem; gap:2rem; max-width:1100px; margin:0 auto; }
 #leftPanel{ flex:1; }
-#sidePanel{ width:380px; background:var(--card); border:2px solid var(--primary); border-radius:10px; height:85vh; display:flex; flex-direction:column; }
+#sidePanel{ width:380px; background:var(--card); border:2px solid var(--primary); border-radius:10px; height:85vh; display:flex; flex-direction:column; position: relative; }
 
 .history-header { padding: 0.8rem; border-bottom: 2px solid var(--accent); font-weight: bold; text-align: center; background: var(--secondary-bg); color: var(--primary); font-size: 0.9rem; }
 #historyPanel { flex:1; overflow-y:auto; padding: 0.5rem; }
@@ -33,33 +32,28 @@ input[type="text"]{
     border-radius:8px; background:var(--card); color:var(--text); font-weight:bold; text-transform:uppercase; box-sizing: border-box;
 }
 
-/* State Buttons Grid */
 #stateGrid{ display:grid; grid-template-columns: repeat(3, 1fr); gap:0.6rem; padding:0; list-style:none; margin-top:1.2rem; }
 #stateGrid li{ background:var(--secondary-bg); color:var(--primary); font-weight:bold; padding:0.8rem 0.2rem; border-radius:6px; text-align:center; cursor:pointer; transition: 0.15s; font-size: 0.85rem; border: 1px solid rgba(0,0,0,0.05); }
 #stateGrid li:hover{ background:var(--accent); color:white; }
 
-/* History Items - Optimized for space */
 .listItem{
     display:grid; grid-template-columns: 24px 1fr auto; align-items:center;
     background:var(--secondary-bg); padding:0.6rem 0.8rem; margin-bottom:0.4rem;
     border-radius:6px; gap:10px; border-left: 4px solid var(--accent);
 }
 .rego-text { font-size: 1.1rem; font-weight: 800; color: var(--primary); text-transform: uppercase; display: block; }
-.date-text { font-size: 0.7rem; color: #666; font-weight: normal; }
+.date-text { font-size: 0.7rem; color: #666; }
 
 .deleteBtn{ width:20px; height:20px; border-radius:50%; border:none; background:#d0d5db; cursor:pointer; font-size: 10px; display: flex; align-items: center; justify-content: center; }
-.copyBtn{ background:var(--success); color:white; border:none; padding: 6px 10px; border-radius:4px; cursor:pointer; font-size: 0.75rem; font-weight: bold; }
-.copyBtn:active { transform: scale(0.95); }
+.copyBtn{ background:var(--accent); color:white; border:none; padding: 6px 10px; border-radius:4px; cursor:pointer; font-size: 0.75rem; font-weight: bold; }
 
-/* Toast Notification */
+/* Dynamic Toast Styling */
 #toast {
-    position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
-    background: #333; color: #fff; padding: 10px 20px; border-radius: 25px;
-    font-size: 0.9rem; font-weight: bold; opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 1000;
+    position: fixed; background: #333; color: #fff; padding: 4px 10px; border-radius: 4px;
+    font-size: 0.75rem; opacity: 0; transition: opacity 0.2s; pointer-events: none; z-index: 1000;
 }
 #toast.show { opacity: 1; }
 
-/* Toggle Switch */
 .toggle-switch{ position:relative; display:inline-block; width:36px; height:18px; }
 .toggle-switch input{ opacity:0; width:0; height:0; }
 .slider{ position:absolute; cursor:pointer; top:0; left:0; right:0; bottom:0; background:#ccc; transition:.4s; border-radius:34px; }
@@ -71,7 +65,7 @@ input:checked + .slider:before{ transform:translateX(18px); }
 <body>
 
 <header>
-    <h1>Vehicle Lookup</h1>
+    <h1>Check Vehicle Registration</h1>
     <div class="theme-toggle-container">
         <label class="toggle-switch">
             <input type="checkbox" id="themeToggle">
@@ -94,7 +88,7 @@ input:checked + .slider:before{ transform:translateX(18px); }
     </div>
 </main>
 
-<div id="toast">Copied!</div>
+<div id="toast">Copied</div>
 
 <script>
 const stateLinks = {
@@ -120,14 +114,15 @@ const stateGrid = document.getElementById("stateGrid");
 const toast = document.getElementById("toast");
 let history = JSON.parse(localStorage.getItem("regoHistory") || "[]");
 
-function showToast() {
-    toast.classList.add("show");
-    setTimeout(() => toast.classList.remove("show"), 1000);
-}
-
-function copyToClipboard(text) {
+function copyWithToast(text, event) {
     if (!text) return;
-    navigator.clipboard.writeText(text.toUpperCase()).then(showToast);
+    navigator.clipboard.writeText(text.toUpperCase()).then(() => {
+        const rect = event.target.getBoundingClientRect();
+        toast.style.top = `${rect.top - 25}px`;
+        toast.style.left = `${rect.left}px`;
+        toast.classList.add("show");
+        setTimeout(() => toast.classList.remove("show"), 1000);
+    });
 }
 
 function initButtons() {
@@ -135,15 +130,15 @@ function initButtons() {
     Object.keys(stateLinks).forEach(state => {
         const li = document.createElement("li");
         li.textContent = state;
-        li.onclick = () => {
+        li.onclick = (e) => {
             const val = input.value.trim().split(" ")[0]; 
-            openState(state, val);
+            openState(state, val, e);
         };
         stateGrid.appendChild(li);
     });
 }
 
-function processInput() {
+function processInput(e) {
     let rawVal = input.value.toUpperCase();
     let trimmedVal = rawVal.trim();
     if (!trimmedVal) return;
@@ -153,18 +148,19 @@ function processInput() {
     const trigger = parts[1];
 
     if (trigger && shorthand[trigger]) {
-        copyToClipboard(rego);
-        openState(shorthand[trigger], rego);
-        input.value = ""; 
+        // We use a dummy object for the event to center toast on input for shorthand
+        const dummyEvent = { target: input }; 
+        navigator.clipboard.writeText(rego).then(() => {
+            openState(shorthand[trigger], rego, dummyEvent);
+            input.value = ""; 
+        });
     }
 }
 
-function openState(state, rego) {
+function openState(state, rego, event) {
     window.open(stateLinks[state], '_blank');
-    
-    // Only copy and add to history if there is a rego provided
     if (rego) {
-        copyToClipboard(rego);
+        copyWithToast(rego, event);
         addToHistory(rego, state);
         input.value = "";
     }
@@ -175,7 +171,6 @@ function addToHistory(rego, state) {
     const timeStr = `${d.getDate()}/${d.getMonth()+1} ${d.getHours()}:${String(d.getMinutes()).padStart(2,'0')}`;
     const cleanRego = rego.toUpperCase();
 
-    // Prevent immediate duplicate
     if(history.length > 0 && history[0].rego === cleanRego && history[0].state === state) return;
 
     history.unshift({ rego: cleanRego, state, date: timeStr });
@@ -196,7 +191,7 @@ function renderHistory() {
                 <span class="rego-text">${item.rego}</span>
                 <span class="date-text">${item.state} • ${item.date}</span>
             </div>
-            <button class="copyBtn" onclick="copyToClipboard('${item.rego}')">Copy</button>
+            <button class="copyBtn" onclick="copyWithToast('${item.rego}', event)">Copy</button>
         `;
         historyPanel.appendChild(row);
     });
@@ -208,7 +203,6 @@ function deleteHistory(i) {
     renderHistory();
 }
 
-// Theme Logic
 const toggle = document.getElementById("themeToggle");
 function setTheme(mode) {
     document.documentElement.setAttribute("data-theme", mode);
@@ -219,7 +213,6 @@ function setTheme(mode) {
 input.addEventListener("input", processInput);
 toggle.addEventListener("change", () => setTheme(toggle.checked ? "dark" : "light"));
 
-// Init
 const savedTheme = localStorage.getItem("theme") || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
 setTheme(savedTheme);
 initButtons();
