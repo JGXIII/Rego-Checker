@@ -4,21 +4,34 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Check Vehicle Registration</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22%23006400%22><path d=%22M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.22.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM5 11l1.5-4.5h11L19 11H5z%22/></svg>">
+
 <style>
 :root{
     --bg:#f7f7f7; --text:#1a1a1a; --card:#ffffff;
     --primary:#002855; --accent:#ff7f27; --secondary-bg:#e6f0ff;
     --header-bg:#002855; --header-text:#ffffff;
+    --heading-green: #2e7d32;
 }
 [data-theme="dark"]{
     --bg:#0d1117; --text:#f0f0f0; --card:#161b22;
     --primary:#ffffff; --secondary-bg:#1c293a;
     --header-bg:#161b22; --header-text:#ffffff;
+    --heading-green: #4caf50;
 }
 
 body{ margin:0; padding:0; background:var(--bg); color:var(--text); font-family:sans-serif; }
-header{ background:var(--header-bg); color:var(--header-text); padding:1rem; text-align:center; position:relative; }
-.theme-toggle-container{ position:absolute; right:15px; top:20px; }
+header{ background:var(--header-bg); color:var(--header-text); padding:1.5rem 1rem; text-align:center; position:relative; }
+
+header h1 { 
+    margin: 0; 
+    display: inline-block; 
+    border-bottom: 5px solid var(--heading-green); 
+    padding-bottom: 6px; 
+    font-size: 1.8rem;
+}
+
+.theme-toggle-container{ position:absolute; right:15px; top:25px; }
 
 main{ display:flex; justify-content:center; padding:1.5rem; gap:2rem; max-width:1100px; margin:0 auto; }
 #leftPanel{ flex:1; }
@@ -45,9 +58,9 @@ input[type="text"]{
 .date-text { font-size: 0.7rem; color: #666; }
 
 .deleteBtn{ width:20px; height:20px; border-radius:50%; border:none; background:#d0d5db; cursor:pointer; font-size: 10px; display: flex; align-items: center; justify-content: center; }
-.copyBtn{ background:var(--accent); color:white; border:none; padding: 6px 10px; border-radius:4px; cursor:pointer; font-size: 0.75rem; font-weight: bold; }
+.copyBtn{ background:var(--accent); color:white; border:none; padding: 6px 10px; border-radius:4px; cursor:pointer; font-size: 0.75rem; font-weight: bold; position: relative; }
 
-/* Dynamic Toast Styling */
+/* Toast Positioning: Now to the Right */
 #toast {
     position: fixed; background: #333; color: #fff; padding: 4px 10px; border-radius: 4px;
     font-size: 0.75rem; opacity: 0; transition: opacity 0.2s; pointer-events: none; z-index: 1000;
@@ -118,8 +131,9 @@ function copyWithToast(text, event) {
     if (!text) return;
     navigator.clipboard.writeText(text.toUpperCase()).then(() => {
         const rect = event.target.getBoundingClientRect();
-        toast.style.top = `${rect.top - 25}px`;
-        toast.style.left = `${rect.left}px`;
+        // Positioned to the right of the button
+        toast.style.top = `${rect.top}px`;
+        toast.style.left = `${rect.right + 10}px`;
         toast.classList.add("show");
         setTimeout(() => toast.classList.remove("show"), 1000);
     });
@@ -148,7 +162,6 @@ function processInput(e) {
     const trigger = parts[1];
 
     if (trigger && shorthand[trigger]) {
-        // We use a dummy object for the event to center toast on input for shorthand
         const dummyEvent = { target: input }; 
         navigator.clipboard.writeText(rego).then(() => {
             openState(shorthand[trigger], rego, dummyEvent);
