@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Vehicle Rego Search</title>
+<title>Vehicle Rego Search Pro</title>
 <style>
 :root{
     --bg:#f7f7f7; --text:#1a1a1a; --card:#ffffff;
@@ -22,7 +22,7 @@ header{ background:var(--header-bg); color:var(--header-text); padding:1rem; tex
 
 main{ display:flex; justify-content:center; padding:1.5rem; gap:2rem; max-width:1200px; margin:0 auto; }
 #leftPanel{ flex:1; }
-#sidePanel{ width:400px; background:var(--card); border:2px solid var(--primary); border-radius:10px; height:80vh; display:flex; flex-direction:column; }
+#sidePanel{ width:400px; background:var(--card); border:2px solid var(--primary); border-radius:10px; height:85vh; display:flex; flex-direction:column; }
 
 .history-header { padding: 1rem; border-bottom: 2px solid var(--accent); font-weight: bold; text-align: center; background: var(--secondary-bg); color: var(--primary); }
 #historyPanel { flex:1; overflow-y:auto; padding: 0.5rem; }
@@ -32,20 +32,26 @@ input[type="text"]{
     border-radius:8px; background:var(--card); color:var(--text); font-weight:bold; text-transform:uppercase; box-sizing: border-box;
 }
 
-#result ul{ display:grid; grid-template-columns:1fr 1fr; gap:0.8rem; padding:0; list-style:none; margin-top:1rem; }
-#result li{ background:var(--secondary-bg); color:var(--primary); font-weight:bold; padding:0.8rem; border-radius:8px; text-align:center; cursor:pointer; }
-#result li:hover{ background:var(--accent); color:white; }
+/* State Buttons Grid - Always Visible */
+#result ul{ display:grid; grid-template-columns: repeat(3, 1fr); gap:0.8rem; padding:0; list-style:none; margin-top:1.5rem; }
+#result li{ background:var(--secondary-bg); color:var(--primary); font-weight:bold; padding:1.2rem 0.5rem; border-radius:8px; text-align:center; cursor:pointer; transition: 0.2s; border: 1px solid transparent; }
+#result li:hover{ background:var(--accent); color:white; transform: translateY(-2px); }
 
+/* History Items */
 .listItem{
     display:grid; grid-template-columns: 30px 1fr auto; align-items:center;
     background:var(--secondary-bg); padding:1rem; margin-bottom:0.6rem;
-    border-radius:8px; gap:10px; border-left: 4px solid var(--accent);
+    border-radius:8px; gap:10px; border-left: 5px solid var(--accent);
 }
-.rego-text { font-size: 1.3rem; font-weight: 800; color: var(--primary); }
-.date-text { font-size: 0.75rem; color: #666; display: block; }
+.rego-text { font-size: 1.5rem; font-weight: 900; color: var(--primary); display: block; letter-spacing: 1px; }
+.date-text { font-size: 0.8rem; color: #666; font-weight: bold; }
 
-.deleteBtn{ width:24px; height:24px; border-radius:50%; border:none; background:#d0d5db; cursor:pointer; }
-.copyBtn{ background:var(--primary); color:white; border:none; padding: 5px 10px; border-radius:4px; cursor:pointer; font-size: 0.8rem; }
+.deleteBtn{ width:24px; height:24px; border-radius:50%; border:none; background:#d0d5db; cursor:pointer; font-weight:bold; }
+.copyBtn{ background:var(--primary); color:white; border:none; padding: 8px 12px; border-radius:4px; cursor:pointer; font-size: 0.85rem; font-weight: bold; }
+
+/* Dark mode tweaks */
+[data-theme="dark"] .date-text { color: #aaa; }
+[data-theme="dark"] .deleteBtn { background: #333; color: #eee; }
 
 /* Toggle Switch */
 .toggle-switch{ position:relative; display:inline-block; width:40px; height:20px; }
@@ -70,13 +76,15 @@ input:checked + .slider:before{ transform:translateX(20px); }
 
 <main>
     <div id="leftPanel">
-        <input id="regoInput" type="text" placeholder="REGO [SPACE] LETTER (E.G. ABC123 V)" autofocus>
-        <div id="result"></div>
+        <input id="regoInput" type="text" placeholder="ENTER REGO (E.G. ABC123 V)" autofocus>
+        <div id="result">
+            <ul id="stateGrid"></ul>
+        </div>
     </div>
 
     <div id="sidePanel">
-        <div class="history-header">SEARCH HISTORY</div>
-        <div id="historyPanel" class="panel"></div>
+        <div class="history-header">HISTORY</div>
+        <div id="historyPanel"></div>
     </div>
 </main>
 
@@ -100,55 +108,64 @@ const shorthand = {
 
 const input = document.getElementById("regoInput");
 const historyPanel = document.getElementById("historyPanel");
+const stateGrid = document.getElementById("stateGrid");
 let history = JSON.parse(localStorage.getItem("regoHistory") || "[]");
 
-function processInput() {
-    let val = input.value.toUpperCase().trim();
-    if (!val) { renderButtons(""); return; }
+// Build Permanent Buttons
+function initButtons() {
+    stateGrid.innerHTML = "";
+    Object.keys(stateLinks).forEach(state => {
+        const li = document.createElement("li");
+        li.textContent = state;
+        li.onclick = () => {
+            const val = input.value.trim().split(" ")[0]; // Get only the rego part
+            if(val) openState(state, val);
+        };
+        stateGrid.appendChild(li);
+    });
+}
 
-    const parts = val.split(" ");
+function processInput() {
+    let rawVal = input.value.toUpperCase();
+    let trimmedVal = rawVal.trim();
+    if (!trimmedVal) return;
+
+    const parts = trimmedVal.split(" ");
     const rego = parts[0];
     const trigger = parts[1];
 
-    // If there's a shorthand letter after a space
+    // Auto-copy logic: If space is pressed and a valid shorthand follows
     if (trigger && shorthand[trigger]) {
-        openState(shorthand[trigger], rego);
-        input.value = ""; 
-        return;
+        navigator.clipboard.writeText(rego).then(() => {
+            openState(shorthand[trigger], rego);
+            input.value = ""; 
+        });
     }
-
-    renderButtons(rego);
 }
 
 function openState(state, rego) {
     if (!rego) return;
+    
+    // Auto-copy rego to clipboard when clicking a button too
+    navigator.clipboard.writeText(rego);
+    
     window.open(stateLinks[state], '_blank');
     addToHistory(rego, state);
     input.value = "";
-    renderButtons("");
 }
 
 function addToHistory(rego, state) {
     const d = new Date();
     const timeStr = `${d.getDate()}/${d.getMonth()+1} ${d.getHours()}:${String(d.getMinutes()).padStart(2,'0')}`;
     
+    // Check if same rego was just added to prevent duplicates
+    if(history.length > 0 && history[0].rego === rego && history[0].state === state) return;
+
     history.unshift({ rego, state, date: timeStr });
     if (history.length > 50) history.pop();
     
     localStorage.setItem("regoHistory", JSON.stringify(history));
     renderHistory();
-}
-
-function renderButtons(rego) {
-    const resultDiv = document.getElementById("result");
-    if (!rego) { resultDiv.innerHTML = ""; return; }
-
-    let html = "<ul>";
-    Object.keys(stateLinks).forEach(state => {
-        html += `<li onclick="openState('${state}', '${rego}')">${state}</li>`;
-    });
-    html += "</ul>";
-    resultDiv.innerHTML = html;
 }
 
 function renderHistory() {
@@ -188,6 +205,7 @@ toggle.addEventListener("change", () => setTheme(toggle.checked ? "dark" : "ligh
 // Init
 const savedTheme = localStorage.getItem("theme") || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
 setTheme(savedTheme);
+initButtons();
 renderHistory();
 </script>
 
