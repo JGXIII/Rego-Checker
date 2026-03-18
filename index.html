@@ -9,6 +9,7 @@
     --bg:#f7f7f7; --text:#1a1a1a; --card:#ffffff;
     --primary:#002855; --accent:#ff7f27; --secondary-bg:#e6f0ff;
     --header-bg:#002855; --header-text:#ffffff;
+    --success: #28a745;
 }
 [data-theme="dark"]{
     --bg:#0d1117; --text:#f0f0f0; --card:#161b22;
@@ -20,46 +21,51 @@ body{ margin:0; padding:0; background:var(--bg); color:var(--text); font-family:
 header{ background:var(--header-bg); color:var(--header-text); padding:1rem; text-align:center; position:relative; }
 .theme-toggle-container{ position:absolute; right:15px; top:20px; }
 
-main{ display:flex; justify-content:center; padding:1.5rem; gap:2rem; max-width:1200px; margin:0 auto; }
+main{ display:flex; justify-content:center; padding:1.5rem; gap:2rem; max-width:1100px; margin:0 auto; }
 #leftPanel{ flex:1; }
-#sidePanel{ width:400px; background:var(--card); border:2px solid var(--primary); border-radius:10px; height:85vh; display:flex; flex-direction:column; }
+#sidePanel{ width:380px; background:var(--card); border:2px solid var(--primary); border-radius:10px; height:85vh; display:flex; flex-direction:column; }
 
-.history-header { padding: 1rem; border-bottom: 2px solid var(--accent); font-weight: bold; text-align: center; background: var(--secondary-bg); color: var(--primary); }
+.history-header { padding: 0.8rem; border-bottom: 2px solid var(--accent); font-weight: bold; text-align: center; background: var(--secondary-bg); color: var(--primary); font-size: 0.9rem; }
 #historyPanel { flex:1; overflow-y:auto; padding: 0.5rem; }
 
 input[type="text"]{
-    width:100%; padding:1.2rem; font-size:1.4rem; border:3px solid var(--primary); 
+    width:100%; padding:1rem; font-size:1.3rem; border:3px solid var(--primary); 
     border-radius:8px; background:var(--card); color:var(--text); font-weight:bold; text-transform:uppercase; box-sizing: border-box;
 }
 
-/* State Buttons Grid - Always Visible */
-#result ul{ display:grid; grid-template-columns: repeat(3, 1fr); gap:0.8rem; padding:0; list-style:none; margin-top:1.5rem; }
-#result li{ background:var(--secondary-bg); color:var(--primary); font-weight:bold; padding:1.2rem 0.5rem; border-radius:8px; text-align:center; cursor:pointer; transition: 0.2s; border: 1px solid transparent; }
-#result li:hover{ background:var(--accent); color:white; transform: translateY(-2px); }
+/* State Buttons Grid */
+#stateGrid{ display:grid; grid-template-columns: repeat(3, 1fr); gap:0.6rem; padding:0; list-style:none; margin-top:1.2rem; }
+#stateGrid li{ background:var(--secondary-bg); color:var(--primary); font-weight:bold; padding:0.8rem 0.2rem; border-radius:6px; text-align:center; cursor:pointer; transition: 0.15s; font-size: 0.85rem; border: 1px solid rgba(0,0,0,0.05); }
+#stateGrid li:hover{ background:var(--accent); color:white; }
 
-/* History Items */
+/* History Items - Optimized for space */
 .listItem{
-    display:grid; grid-template-columns: 30px 1fr auto; align-items:center;
-    background:var(--secondary-bg); padding:1rem; margin-bottom:0.6rem;
-    border-radius:8px; gap:10px; border-left: 5px solid var(--accent);
+    display:grid; grid-template-columns: 24px 1fr auto; align-items:center;
+    background:var(--secondary-bg); padding:0.6rem 0.8rem; margin-bottom:0.4rem;
+    border-radius:6px; gap:10px; border-left: 4px solid var(--accent);
 }
-.rego-text { font-size: 1.5rem; font-weight: 900; color: var(--primary); display: block; letter-spacing: 1px; }
-.date-text { font-size: 0.8rem; color: #666; font-weight: bold; }
+.rego-text { font-size: 1.1rem; font-weight: 800; color: var(--primary); text-transform: uppercase; display: block; }
+.date-text { font-size: 0.7rem; color: #666; font-weight: normal; }
 
-.deleteBtn{ width:24px; height:24px; border-radius:50%; border:none; background:#d0d5db; cursor:pointer; font-weight:bold; }
-.copyBtn{ background:var(--primary); color:white; border:none; padding: 8px 12px; border-radius:4px; cursor:pointer; font-size: 0.85rem; font-weight: bold; }
+.deleteBtn{ width:20px; height:20px; border-radius:50%; border:none; background:#d0d5db; cursor:pointer; font-size: 10px; display: flex; align-items: center; justify-content: center; }
+.copyBtn{ background:var(--success); color:white; border:none; padding: 6px 10px; border-radius:4px; cursor:pointer; font-size: 0.75rem; font-weight: bold; }
+.copyBtn:active { transform: scale(0.95); }
 
-/* Dark mode tweaks */
-[data-theme="dark"] .date-text { color: #aaa; }
-[data-theme="dark"] .deleteBtn { background: #333; color: #eee; }
+/* Toast Notification */
+#toast {
+    position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+    background: #333; color: #fff; padding: 10px 20px; border-radius: 25px;
+    font-size: 0.9rem; font-weight: bold; opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 1000;
+}
+#toast.show { opacity: 1; }
 
 /* Toggle Switch */
-.toggle-switch{ position:relative; display:inline-block; width:40px; height:20px; }
+.toggle-switch{ position:relative; display:inline-block; width:36px; height:18px; }
 .toggle-switch input{ opacity:0; width:0; height:0; }
 .slider{ position:absolute; cursor:pointer; top:0; left:0; right:0; bottom:0; background:#ccc; transition:.4s; border-radius:34px; }
-.slider:before{ position:absolute; content:""; height:14px; width:14px; left:3px; bottom:3px; background:white; transition:.4s; border-radius:50%; }
+.slider:before{ position:absolute; content:""; height:12px; width:12px; left:3px; bottom:3px; background:white; transition:.4s; border-radius:50%; }
 input:checked + .slider{ background:var(--accent); }
-input:checked + .slider:before{ transform:translateX(20px); }
+input:checked + .slider:before{ transform:translateX(18px); }
 </style>
 </head>
 <body>
@@ -76,7 +82,7 @@ input:checked + .slider:before{ transform:translateX(20px); }
 
 <main>
     <div id="leftPanel">
-        <input id="regoInput" type="text" placeholder="ENTER REGO (E.G. ABC123 V)" autofocus>
+        <input id="regoInput" type="text" placeholder="SEARCH REGO OR VIN" autofocus autocomplete="off">
         <div id="result">
             <ul id="stateGrid"></ul>
         </div>
@@ -87,6 +93,8 @@ input:checked + .slider:before{ transform:translateX(20px); }
         <div id="historyPanel"></div>
     </div>
 </main>
+
+<div id="toast">Copied!</div>
 
 <script>
 const stateLinks = {
@@ -109,17 +117,27 @@ const shorthand = {
 const input = document.getElementById("regoInput");
 const historyPanel = document.getElementById("historyPanel");
 const stateGrid = document.getElementById("stateGrid");
+const toast = document.getElementById("toast");
 let history = JSON.parse(localStorage.getItem("regoHistory") || "[]");
 
-// Build Permanent Buttons
+function showToast() {
+    toast.classList.add("show");
+    setTimeout(() => toast.classList.remove("show"), 1000);
+}
+
+function copyToClipboard(text) {
+    if (!text) return;
+    navigator.clipboard.writeText(text.toUpperCase()).then(showToast);
+}
+
 function initButtons() {
     stateGrid.innerHTML = "";
     Object.keys(stateLinks).forEach(state => {
         const li = document.createElement("li");
         li.textContent = state;
         li.onclick = () => {
-            const val = input.value.trim().split(" ")[0]; // Get only the rego part
-            if(val) openState(state, val);
+            const val = input.value.trim().split(" ")[0]; 
+            openState(state, val);
         };
         stateGrid.appendChild(li);
     });
@@ -134,35 +152,34 @@ function processInput() {
     const rego = parts[0];
     const trigger = parts[1];
 
-    // Auto-copy logic: If space is pressed and a valid shorthand follows
     if (trigger && shorthand[trigger]) {
-        navigator.clipboard.writeText(rego).then(() => {
-            openState(shorthand[trigger], rego);
-            input.value = ""; 
-        });
+        copyToClipboard(rego);
+        openState(shorthand[trigger], rego);
+        input.value = ""; 
     }
 }
 
 function openState(state, rego) {
-    if (!rego) return;
-    
-    // Auto-copy rego to clipboard when clicking a button too
-    navigator.clipboard.writeText(rego);
-    
     window.open(stateLinks[state], '_blank');
-    addToHistory(rego, state);
-    input.value = "";
+    
+    // Only copy and add to history if there is a rego provided
+    if (rego) {
+        copyToClipboard(rego);
+        addToHistory(rego, state);
+        input.value = "";
+    }
 }
 
 function addToHistory(rego, state) {
     const d = new Date();
     const timeStr = `${d.getDate()}/${d.getMonth()+1} ${d.getHours()}:${String(d.getMinutes()).padStart(2,'0')}`;
-    
-    // Check if same rego was just added to prevent duplicates
-    if(history.length > 0 && history[0].rego === rego && history[0].state === state) return;
+    const cleanRego = rego.toUpperCase();
 
-    history.unshift({ rego, state, date: timeStr });
-    if (history.length > 50) history.pop();
+    // Prevent immediate duplicate
+    if(history.length > 0 && history[0].rego === cleanRego && history[0].state === state) return;
+
+    history.unshift({ rego: cleanRego, state, date: timeStr });
+    if (history.length > 100) history.pop();
     
     localStorage.setItem("regoHistory", JSON.stringify(history));
     renderHistory();
@@ -179,7 +196,7 @@ function renderHistory() {
                 <span class="rego-text">${item.rego}</span>
                 <span class="date-text">${item.state} • ${item.date}</span>
             </div>
-            <button class="copyBtn" onclick="navigator.clipboard.writeText('${item.rego}')">Copy</button>
+            <button class="copyBtn" onclick="copyToClipboard('${item.rego}')">Copy</button>
         `;
         historyPanel.appendChild(row);
     });
