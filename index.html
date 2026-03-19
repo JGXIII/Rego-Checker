@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Check Vehicle Registration</title>
+<title>CHECK VEHICLE REGISTRATION</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22%23006400%22><path d=%22M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.22.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM5 11l1.5-4.5h11L19 11H5z%22/></svg>">
 <style>
 :root{
@@ -21,82 +21,79 @@
 
 body{ margin:0; padding:0; background:var(--bg); color:var(--text); font-family:sans-serif; }
 header{ background:var(--header-bg); color:var(--header-text); padding:1.2rem; text-align:center; position:relative; }
-header h1 { margin: 0; display: inline-block; border-bottom: 5px solid var(--heading-green); padding-bottom: 4px; font-size: 1.8rem; }
+header h1 { margin: 0; display: inline-block; border-bottom: 5px solid var(--heading-green); padding-bottom: 4px; font-size: 1.6rem; text-transform: uppercase; letter-spacing: 1px; }
 .theme-toggle-container{ position:absolute; right:15px; top:20px; }
 
-main{ display:flex; justify-content:center; padding:1.5rem; gap:1.5rem; max-width:1200px; margin:0 auto; }
+main{ display:flex; justify-content:center; padding:1.5rem; gap:1.5rem; max-width:1150px; margin:0 auto; }
 #leftPanel{ flex:1; }
-#sidePanel{ width:400px; background:var(--card); border:2px solid var(--primary); border-radius:10px; height:85vh; display:flex; flex-direction:column; position: relative; box-shadow: 0 4px 10px rgba(0,0,0,0.15); }
+#sidePanel{ width:380px; background:var(--card); border:2px solid var(--primary); border-radius:10px; height:85vh; display:flex; flex-direction:column; position: relative; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
 
-.history-header { padding: 0.8rem; border-bottom: 2px solid var(--accent); font-weight: bold; text-align: center; background: var(--secondary-bg); color: var(--primary); font-size: 1rem; }
+.history-header { padding: 0.8rem; border-bottom: 2px solid var(--accent); font-weight: bold; text-align: center; background: var(--secondary-bg); color: var(--primary); font-size: 0.9rem; letter-spacing: 1px; }
 #historyPanel { flex:1; overflow-y:auto; padding: 0.5rem; }
 
 input[type="text"]{
-    width:100%; padding:1.2rem; font-size:1.4rem; border:3px solid var(--primary); 
+    width:100%; padding:1rem; font-size:1.3rem; border:3px solid var(--primary); 
     border-radius:10px; background:var(--card); color:var(--text); font-weight:bold; text-transform:uppercase; box-sizing: border-box;
-    box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
 }
 
-/* Larger State Buttons */
-#stateGrid{ display:grid; grid-template-columns: repeat(3, 1fr); gap:0.8rem; padding:0; list-style:none; margin-top:1.5rem; }
+/* Medium-Large State Buttons */
+#stateGrid{ display:grid; grid-template-columns: repeat(3, 1fr); gap:0.6rem; padding:0; list-style:none; margin-top:1.2rem; }
 #stateGrid li{ 
-    background:var(--secondary-bg); color:var(--primary); font-weight:900; 
-    padding:1.4rem 0.5rem; border-radius:10px; text-align:center; cursor:pointer; 
-    transition: 0.15s; font-size: 1.1rem; border: 2px solid rgba(0,0,0,0.05);
+    background:var(--secondary-bg); color:var(--primary); font-weight:800; 
+    padding:1rem 0.4rem; border-radius:8px; text-align:center; cursor:pointer; 
+    transition: 0.1s; font-size: 1rem; border: 1px solid rgba(0,0,0,0.05);
     display: flex; align-items: center; justify-content: center;
-    min-height: 60px;
+    min-height: 45px;
 }
 #stateGrid li:hover{ background:var(--accent); color:white; border-color: var(--accent); }
-#stateGrid li:active{ transform: scale(0.94); }
+#stateGrid li:active{ transform: scale(0.95); }
 
-.date-group-header { font-size: 0.8rem; font-weight: 900; color: var(--accent); margin: 15px 0 8px 5px; text-transform: uppercase; letter-spacing: 1px; }
+.date-group-header { font-size: 0.75rem; font-weight: 900; color: var(--accent); margin: 12px 0 6px 5px; text-transform: uppercase; letter-spacing: 0.5px; }
 .listItem{
-    display:grid; grid-template-columns: 28px 1fr auto; align-items:center;
-    background:var(--secondary-bg); padding:0.7rem 0.8rem; margin-bottom:0.4rem;
-    border-radius:8px; gap:10px; border-left: 5px solid var(--accent);
+    display:grid; grid-template-columns: 26px 1fr auto; align-items:center;
+    background:var(--secondary-bg); padding:0.6rem 0.8rem; margin-bottom:0.3rem;
+    border-radius:6px; gap:8px; border-left: 4px solid var(--accent);
 }
-.rego-link { font-size: 1.1rem; font-weight: 800; color: var(--primary); text-transform: uppercase; cursor: pointer; text-decoration: none; }
+.rego-link { font-size: 1rem; font-weight: 800; color: var(--primary); text-transform: uppercase; cursor: pointer; text-decoration: none; }
 .rego-link:hover { color: var(--accent); }
-.date-text { font-size: 0.75rem; color: #666; font-weight: 600; }
+.date-text { font-size: 0.7rem; color: #666; font-weight: 600; }
 
-.deleteBtn{ width:22px; height:22px; border-radius:50%; border:none; background:#d0d5db; cursor:pointer; font-size: 11px; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+.deleteBtn{ width:20px; height:20px; border-radius:50%; border:none; background:#d0d5db; cursor:pointer; font-size: 10px; display: flex; align-items: center; justify-content: center; }
 
-/* Tactile Animations */
+/* Interactive Elements */
 .copyBtn, .pagination button { transition: transform 0.1s ease; cursor: pointer; }
-.copyBtn:active, .pagination button:active { transform: scale(0.88); }
+.copyBtn:active, .pagination button:active { transform: scale(0.9); }
+.copyBtn{ background:var(--accent); color:white; border:none; padding: 6px 10px; border-radius:5px; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; }
 
-.copyBtn{ background:var(--accent); color:white; border:none; padding: 8px 12px; border-radius:6px; font-size: 0.8rem; font-weight: 900; text-transform: uppercase; }
-
-/* Clearer Pagination */
+/* Standard Orange Pagination */
 .pagination { 
     display: none; 
-    justify-content: center; align-items: center; gap: 25px; 
-    padding: 15px; background: var(--secondary-bg); border-top: 3px solid var(--accent); 
+    justify-content: center; align-items: center; gap: 20px; 
+    padding: 12px; background: var(--secondary-bg); border-top: 2px solid var(--accent); 
     border-radius: 0 0 10px 10px; 
 }
 .pagination button { 
     background: var(--accent); color: white; border: none; 
-    padding: 10px 22px; border-radius: 8px; font-size: 1.4rem; font-weight: bold;
-    box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+    padding: 6px 16px; border-radius: 6px; font-size: 1.2rem; font-weight: bold;
 }
-.pagination button:disabled { background: #ccc; cursor: not-allowed; box-shadow: none; transform: none; }
-#pageLabel { font-weight: 900; color: var(--primary); font-size: 1rem; }
+.pagination button:disabled { background: #ccc; cursor: not-allowed; transform: none; }
+#pageLabel { font-weight: 800; color: var(--primary); font-size: 0.9rem; }
 
-#toast { position: fixed; background: #333; color: #fff; padding: 6px 12px; border-radius: 6px; font-size: 0.8rem; font-weight: bold; opacity: 0; transition: opacity 0.2s; pointer-events: none; z-index: 1000; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
+#toast { position: fixed; background: #333; color: #fff; padding: 5px 10px; border-radius: 5px; font-size: 0.75rem; font-weight: bold; opacity: 0; transition: opacity 0.2s; pointer-events: none; z-index: 1000; }
 #toast.show { opacity: 1; }
 
-.toggle-switch{ position:relative; display:inline-block; width:40px; height:20px; }
+.toggle-switch{ position:relative; display:inline-block; width:36px; height:18px; }
 .toggle-switch input{ opacity:0; width:0; height:0; }
 .slider{ position:absolute; cursor:pointer; top:0; left:0; right:0; bottom:0; background:#ccc; transition:.4s; border-radius:34px; }
-.slider:before{ position:absolute; content:""; height:14px; width:14px; left:3px; bottom:3px; background:white; transition:.4s; border-radius:50%; }
+.slider:before{ position:absolute; content:""; height:12px; width:12px; left:3px; bottom:3px; background:white; transition:.4s; border-radius:50%; }
 input:checked + .slider{ background:var(--accent); }
-input:checked + .slider:before{ transform:translateX(20px); }
+input:checked + .slider:before{ transform:translateX(18px); }
 </style>
 </head>
 <body>
 
 <header>
-    <h1>Check Vehicle Registration</h1>
+    <h1>CHECK VEHICLE REGISTRATION</h1>
     <div class="theme-toggle-container">
         <label class="toggle-switch"><input type="checkbox" id="themeToggle"><span class="slider"></span></label>
     </div>
@@ -174,7 +171,6 @@ function openState(state, rego, event) {
         const d = new Date();
         const dateKey = `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()}`;
         const timeStr = `${d.getHours()}:${String(d.getMinutes()).padStart(2,'0')}`;
-        
         if(history.length === 0 || history[0].rego !== rego.toUpperCase() || history[0].state !== state) {
             history.unshift({ rego: rego.toUpperCase(), state, time: timeStr, date: dateKey });
             localStorage.setItem("regoHistory", JSON.stringify(history));
@@ -187,10 +183,8 @@ function openState(state, rego, event) {
 function renderHistory() {
     historyPanel.innerHTML = "";
     paginationBar.style.display = (history.length > itemsPerPage) ? "flex" : "none";
-
     const start = (currentPage - 1) * itemsPerPage;
     const paginated = history.slice(start, start + itemsPerPage);
-    
     let lastDate = "";
     paginated.forEach((item, i) => {
         if (item.date !== lastDate) {
@@ -210,18 +204,12 @@ function renderHistory() {
             <button class="copyBtn" onclick="copyWithToast('${item.rego}', event)">Copy</button>`;
         historyPanel.appendChild(row);
     });
-    
     document.getElementById("pageLabel").textContent = `Page ${currentPage}`;
     document.getElementById("prevBtn").disabled = (currentPage === 1);
     document.getElementById("nextBtn").disabled = (start + itemsPerPage >= history.length);
 }
 
-function changePage(dir) { 
-    currentPage += dir; 
-    renderHistory(); 
-    historyPanel.scrollTop = 0;
-}
-
+function changePage(dir) { currentPage += dir; renderHistory(); historyPanel.scrollTop = 0; }
 function deleteHistory(i) { 
     history.splice(i, 1); 
     if ((currentPage - 1) * itemsPerPage >= history.length && currentPage > 1) currentPage--;
@@ -236,11 +224,9 @@ toggle.addEventListener("change", () => {
     document.documentElement.setAttribute("data-theme", mode);
     localStorage.setItem("theme", mode);
 });
-
 const savedTheme = localStorage.getItem("theme") || "light";
 document.documentElement.setAttribute("data-theme", savedTheme);
 toggle.checked = (savedTheme === "dark");
-
 initButtons();
 renderHistory();
 </script>
