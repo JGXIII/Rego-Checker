@@ -11,12 +11,14 @@
     --primary:#002855; --accent:#ff7f27; --secondary-bg:#e6f0ff;
     --header-bg:#002855; --header-text:#ffffff;
     --heading-green: #2e7d32;
+    --danger: #d32f2f;
 }
 [data-theme="dark"]{
     --bg:#0d1117; --text:#f0f0f0; --card:#161b22;
     --primary:#ffffff; --secondary-bg:#1c293a;
     --header-bg:#161b22; --header-text:#ffffff;
     --heading-green: #4caf50;
+    --danger: #ef5350;
 }
 
 body{ margin:0; padding:0; background:var(--bg); color:var(--text); font-family:sans-serif; }
@@ -32,18 +34,18 @@ main{ display:flex; justify-content:center; padding:1.5rem; gap:1.5rem; max-widt
 #historyPanel { flex:1; overflow-y:auto; padding: 0.5rem; }
 
 input[type="text"]{
-    width:100%; padding:1rem; font-size:1.3rem; border:3px solid var(--primary); 
+    width:100%; padding:0.9rem 1.1rem; font-size:1.3rem; border:3px solid var(--primary); 
     border-radius:10px; background:var(--card); color:var(--text); font-weight:bold; text-transform:uppercase; box-sizing: border-box;
 }
 
-/* Medium-Large State Buttons */
-#stateGrid{ display:grid; grid-template-columns: repeat(3, 1fr); gap:0.6rem; padding:0; list-style:none; margin-top:1.2rem; }
+/* Compact Medium-Large State Buttons */
+#stateGrid{ display:grid; grid-template-columns: repeat(3, 1fr); gap:0.5rem; padding:0; list-style:none; margin-top:1rem; }
 #stateGrid li{ 
     background:var(--secondary-bg); color:var(--primary); font-weight:800; 
-    padding:1rem 0.4rem; border-radius:8px; text-align:center; cursor:pointer; 
+    padding:0.9rem 0.4rem; border-radius:8px; text-align:center; cursor:pointer; 
     transition: 0.1s; font-size: 1rem; border: 1px solid rgba(0,0,0,0.05);
     display: flex; align-items: center; justify-content: center;
-    min-height: 45px;
+    min-height: 40px;
 }
 #stateGrid li:hover{ background:var(--accent); color:white; border-color: var(--accent); }
 #stateGrid li:active{ transform: scale(0.95); }
@@ -58,11 +60,19 @@ input[type="text"]{
 .rego-link:hover { color: var(--accent); }
 .date-text { font-size: 0.7rem; color: #666; font-weight: 600; }
 
-.deleteBtn{ width:20px; height:20px; border-radius:50%; border:none; background:#d0d5db; cursor:pointer; font-size: 10px; display: flex; align-items: center; justify-content: center; }
+/* Interactive Elements (Copy, Delete, Pagination) */
+.copyBtn, .pagination button, .deleteBtn { transition: transform 0.1s ease; cursor: pointer; }
+.copyBtn:active, .pagination button:active, .deleteBtn:active { transform: scale(0.9); }
 
-/* Interactive Elements */
-.copyBtn, .pagination button { transition: transform 0.1s ease; cursor: pointer; }
-.copyBtn:active, .pagination button:active { transform: scale(0.9); }
+/* Animated Delete Button with Hover-Red */
+.deleteBtn{ 
+    width:20px; height:20px; border-radius:50%; border:none; 
+    background:#d0d5db; color: #333; font-size: 10px; 
+    display: flex; align-items: center; justify-content: center; 
+    transition: background-color 0.15s ease, color 0.15s ease, transform 0.1s ease;
+}
+.deleteBtn:hover { background-color: var(--danger); color: white; }
+
 .copyBtn{ background:var(--accent); color:white; border:none; padding: 6px 10px; border-radius:5px; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; }
 
 /* Standard Orange Pagination */
