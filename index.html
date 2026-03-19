@@ -21,83 +21,83 @@
     --danger: #ef5350;
 }
 
-body{ margin:0; padding:0; background:var(--bg); color:var(--text); font-family:sans-serif; }
-header{ background:var(--header-bg); color:var(--header-text); padding:1.2rem; text-align:center; position:relative; }
-header h1 { margin: 0; display: inline-block; border-bottom: 5px solid var(--heading-green); padding-bottom: 4px; font-size: 1.6rem; text-transform: uppercase; letter-spacing: 1px; }
-.theme-toggle-container{ position:absolute; right:15px; top:20px; }
+body{ margin:0; padding:0; background:var(--bg); color:var(--text); font-family:sans-serif; overflow: hidden; }
+header{ background:var(--header-bg); color:var(--header-text); padding:1rem; text-align:center; position:relative; }
+header h1 { margin: 0; display: inline-block; border-bottom: 5px solid var(--heading-green); padding-bottom: 4px; font-size: 1.5rem; text-transform: uppercase; letter-spacing: 1px; }
+.theme-toggle-container{ position:absolute; right:15px; top:18px; }
 
-main{ display:flex; justify-content:center; padding:1.5rem; gap:1.5rem; max-width:1150px; margin:0 auto; }
+main{ display:flex; justify-content:center; padding:1.5rem; gap:1.5rem; max-width:1150px; margin:0 auto; height: calc(100vh - 80px); box-sizing: border-box; }
 #leftPanel{ flex:1; }
-#sidePanel{ width:380px; background:var(--card); border:2px solid var(--primary); border-radius:10px; height:85vh; display:flex; flex-direction:column; position: relative; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+#sidePanel{ width:360px; background:var(--card); border:2px solid var(--primary); border-radius:10px; height:100%; display:flex; flex-direction:column; position: relative; box-shadow: 0 4px 10px rgba(0,0,0,0.1); overflow: hidden; }
 
-.history-header { padding: 0.8rem; border-bottom: 2px solid var(--accent); font-weight: bold; text-align: center; background: var(--secondary-bg); color: var(--primary); font-size: 0.9rem; letter-spacing: 1px; }
-#historyPanel { flex:1; overflow-y:auto; padding: 0.5rem; }
+.history-header { padding: 0.7rem; border-bottom: 2px solid var(--accent); font-weight: bold; text-align: center; background: var(--secondary-bg); color: var(--primary); font-size: 0.85rem; letter-spacing: 1px; flex-shrink: 0; }
+#historyPanel { flex:1; overflow-y: auto; padding: 0.4rem; scrollbar-width: none; -ms-overflow-style: none; }
+#historyPanel::-webkit-scrollbar { display: none; }
 
 input[type="text"]{
-    width:100%; padding:0.9rem 1.1rem; font-size:1.3rem; border:3px solid var(--primary); 
+    width:100%; padding:0.9rem; font-size:1.2rem; border:3px solid var(--primary); 
     border-radius:10px; background:var(--card); color:var(--text); font-weight:bold; text-transform:uppercase; box-sizing: border-box;
 }
 
-/* Compact Medium-Large State Buttons */
 #stateGrid{ display:grid; grid-template-columns: repeat(3, 1fr); gap:0.5rem; padding:0; list-style:none; margin-top:1rem; }
 #stateGrid li{ 
     background:var(--secondary-bg); color:var(--primary); font-weight:800; 
-    padding:0.9rem 0.4rem; border-radius:8px; text-align:center; cursor:pointer; 
-    transition: 0.1s; font-size: 1rem; border: 1px solid rgba(0,0,0,0.05);
+    padding:0.8rem 0.4rem; border-radius:8px; text-align:center; cursor:pointer; 
+    transition: 0.1s; font-size: 0.95rem; border: 1px solid rgba(0,0,0,0.05);
     display: flex; align-items: center; justify-content: center;
     min-height: 40px;
 }
 #stateGrid li:hover{ background:var(--accent); color:white; border-color: var(--accent); }
 #stateGrid li:active{ transform: scale(0.95); }
 
-.date-group-header { font-size: 0.75rem; font-weight: 900; color: var(--accent); margin: 12px 0 6px 5px; text-transform: uppercase; letter-spacing: 0.5px; }
+.date-group-header { font-size: 0.7rem; font-weight: 900; color: var(--accent); margin: 8px 0 4px 5px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+/* Adjusted 10% smaller list items */
 .listItem{
-    display:grid; grid-template-columns: 26px 1fr auto; align-items:center;
-    background:var(--secondary-bg); padding:0.6rem 0.8rem; margin-bottom:0.3rem;
+    display:grid; grid-template-columns: 24px 1fr auto; align-items:center;
+    background:var(--secondary-bg); padding:0.5rem 0.7rem; margin-bottom:0.25rem;
     border-radius:6px; gap:8px; border-left: 4px solid var(--accent);
 }
-.rego-link { font-size: 1rem; font-weight: 800; color: var(--primary); text-transform: uppercase; cursor: pointer; text-decoration: none; }
+.rego-link { font-size: 0.95rem; font-weight: 800; color: var(--primary); text-transform: uppercase; cursor: pointer; text-decoration: none; }
 .rego-link:hover { color: var(--accent); }
-.date-text { font-size: 0.7rem; color: #666; font-weight: 600; }
+.date-text { font-size: 0.65rem; color: #666; font-weight: 600; }
 
-/* Interactive Elements (Copy, Delete, Pagination) */
-.copyBtn, .pagination button, .deleteBtn { transition: transform 0.1s ease; cursor: pointer; }
-.copyBtn:active, .pagination button:active, .deleteBtn:active { transform: scale(0.9); }
-
-/* Animated Delete Button with Hover-Red */
 .deleteBtn{ 
-    width:20px; height:20px; border-radius:50%; border:none; 
-    background:#d0d5db; color: #333; font-size: 10px; 
+    width:18px; height:18px; border-radius:50%; border:none; 
+    background:#d0d5db; color: #333; font-size: 9px; 
     display: flex; align-items: center; justify-content: center; 
     transition: background-color 0.15s ease, color 0.15s ease, transform 0.1s ease;
 }
 .deleteBtn:hover { background-color: var(--danger); color: white; }
+.deleteBtn:active { transform: scale(0.9); }
 
-.copyBtn{ background:var(--accent); color:white; border:none; padding: 6px 10px; border-radius:5px; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; }
+.copyBtn{ background:var(--accent); color:white; border:none; padding: 5px 9px; border-radius:5px; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; cursor: pointer; transition: transform 0.1s; }
+.copyBtn:active { transform: scale(0.9); }
 
-/* Standard Orange Pagination */
+/* Standard Orange Pagination - Flex Shrink 0 to ensure it doesn't compress */
 .pagination { 
     display: none; 
-    justify-content: center; align-items: center; gap: 20px; 
-    padding: 12px; background: var(--secondary-bg); border-top: 2px solid var(--accent); 
-    border-radius: 0 0 10px 10px; 
+    justify-content: center; align-items: center; gap: 15px; 
+    padding: 10px; background: var(--secondary-bg); border-top: 2px solid var(--accent); 
+    flex-shrink: 0;
 }
 .pagination button { 
     background: var(--accent); color: white; border: none; 
-    padding: 6px 16px; border-radius: 6px; font-size: 1.2rem; font-weight: bold;
+    padding: 4px 14px; border-radius: 6px; font-size: 1.1rem; font-weight: bold; cursor: pointer; transition: transform 0.1s;
 }
+.pagination button:active { transform: scale(0.9); }
 .pagination button:disabled { background: #ccc; cursor: not-allowed; transform: none; }
-#pageLabel { font-weight: 800; color: var(--primary); font-size: 0.9rem; }
+#pageLabel { font-weight: 800; color: var(--primary); font-size: 0.85rem; }
 
 #toast { position: fixed; background: #333; color: #fff; padding: 5px 10px; border-radius: 5px; font-size: 0.75rem; font-weight: bold; opacity: 0; transition: opacity 0.2s; pointer-events: none; z-index: 1000; }
 #toast.show { opacity: 1; }
 
-.toggle-switch{ position:relative; display:inline-block; width:36px; height:18px; }
+.toggle-switch{ position:relative; display:inline-block; width:34px; height:18px; }
 .toggle-switch input{ opacity:0; width:0; height:0; }
 .slider{ position:absolute; cursor:pointer; top:0; left:0; right:0; bottom:0; background:#ccc; transition:.4s; border-radius:34px; }
 .slider:before{ position:absolute; content:""; height:12px; width:12px; left:3px; bottom:3px; background:white; transition:.4s; border-radius:50%; }
 input:checked + .slider{ background:var(--accent); }
-input:checked + .slider:before{ transform:translateX(18px); }
+input:checked + .slider:before{ transform:translateX(16px); }
 </style>
 </head>
 <body>
