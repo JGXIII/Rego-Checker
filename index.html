@@ -26,7 +26,7 @@ header h1 { margin: 0; display: inline-block; border-bottom: 4px solid var(--hea
 
 main{ display:flex; justify-content:center; padding:1.5rem; gap:1.5rem; max-width:1100px; margin:0 auto; }
 #leftPanel{ flex:1; }
-#sidePanel{ width:380px; background:var(--card); border:2px solid var(--primary); border-radius:10px; height:85vh; display:flex; flex-direction:column; position: relative; }
+#sidePanel{ width:380px; background:var(--card); border:2px solid var(--primary); border-radius:10px; height:85vh; display:flex; flex-direction:column; position: relative; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
 
 .history-header { padding: 0.8rem; border-bottom: 2px solid var(--accent); font-weight: bold; text-align: center; background: var(--secondary-bg); color: var(--primary); font-size: 0.9rem; }
 #historyPanel { flex:1; overflow-y:auto; padding: 0.5rem; }
@@ -39,6 +39,7 @@ input[type="text"]{
 #stateGrid{ display:grid; grid-template-columns: repeat(3, 1fr); gap:0.5rem; padding:0; list-style:none; margin-top:1rem; }
 #stateGrid li{ background:var(--secondary-bg); color:var(--primary); font-weight:bold; padding:0.7rem 0.2rem; border-radius:6px; text-align:center; cursor:pointer; transition: 0.15s; font-size: 0.8rem; border: 1px solid rgba(0,0,0,0.05); }
 #stateGrid li:hover{ background:var(--accent); color:white; }
+#stateGrid li:active{ transform: scale(0.96); }
 
 .date-group-header { font-size: 0.75rem; font-weight: 900; color: var(--accent); margin: 10px 0 5px 5px; text-transform: uppercase; letter-spacing: 1px; }
 .listItem{
@@ -51,11 +52,27 @@ input[type="text"]{
 .date-text { font-size: 0.7rem; color: #666; }
 
 .deleteBtn{ width:20px; height:20px; border-radius:50%; border:none; background:#d0d5db; cursor:pointer; font-size: 10px; display: flex; align-items: center; justify-content: center; }
-.copyBtn{ background:var(--accent); color:white; border:none; padding: 5px 8px; border-radius:4px; cursor:pointer; font-size: 0.7rem; font-weight: bold; }
 
-.pagination { display: flex; justify-content: center; gap: 10px; padding: 10px; background: var(--secondary-bg); border-top: 1px solid #ccc; font-size: 0.8rem; border-radius: 0 0 10px 10px; }
-.pagination button { background: var(--primary); color: white; border: none; padding: 4px 10px; border-radius: 4px; cursor: pointer; }
-.pagination button:disabled { background: #ccc; cursor: not-allowed; }
+/* Click Animations */
+.copyBtn, .pagination button { transition: transform 0.1s ease; cursor: pointer; }
+.copyBtn:active, .pagination button:active { transform: scale(0.88); }
+
+.copyBtn{ background:var(--accent); color:white; border:none; padding: 5px 8px; border-radius:4px; font-size: 0.7rem; font-weight: bold; }
+
+/* Pagination Styling */
+.pagination { 
+    display: none; 
+    justify-content: center; align-items: center; gap: 20px; 
+    padding: 12px; background: var(--secondary-bg); border-top: 2px solid var(--accent); 
+    font-size: 0.85rem; border-radius: 0 0 10px 10px; 
+}
+.pagination button { 
+    background: var(--accent); color: white; border: none; 
+    padding: 8px 18px; border-radius: 6px; font-size: 1.2rem; font-weight: bold;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+}
+.pagination button:disabled { background: #ccc; cursor: not-allowed; box-shadow: none; transform: none; }
+#pageLabel { font-weight: bold; color: var(--primary); }
 
 #toast { position: fixed; background: #333; color: #fff; padding: 4px 10px; border-radius: 4px; font-size: 0.7rem; opacity: 0; transition: opacity 0.2s; pointer-events: none; z-index: 1000; }
 #toast.show { opacity: 1; }
@@ -79,17 +96,17 @@ input:checked + .slider:before{ transform:translateX(18px); }
 
 <main>
     <div id="leftPanel">
-        <input id="regoInput" type="text" placeholder="REGO OR VIN (E.G. ABC123 V)" autofocus autocomplete="off">
+        <input id="regoInput" type="text" placeholder="SEARCH REGO OR VIN" autofocus autocomplete="off">
         <ul id="stateGrid"></ul>
     </div>
 
     <div id="sidePanel">
         <div class="history-header">HISTORY</div>
         <div id="historyPanel"></div>
-        <div class="pagination">
-            <button id="prevBtn" onclick="changePage(-1)">←</button>
+        <div class="pagination" id="paginationBar">
+            <button id="prevBtn" onclick="changePage(-1)">&#8592;</button>
             <span id="pageLabel">Page 1</span>
-            <button id="nextBtn" onclick="changePage(1)">→</button>
+            <button id="nextBtn" onclick="changePage(1)">&#8594;</button>
         </div>
     </div>
 </main>
@@ -97,24 +114,15 @@ input:checked + .slider:before{ transform:translateX(18px); }
 <div id="toast">Copied</div>
 
 <script>
-const stateLinks = { 
-    VIC: "https://www.vicroads.vic.gov.au/registration/buy-sell-or-transfer-a-vehicle/check-vehicle-registration/vehicle-registration-enquiry", 
-    NSW: "https://check-registration.service.nsw.gov.au/?isLoginRequired=true", 
-    QLD: "https://www.service.transport.qld.gov.au/checkrego/application/VehicleSearch.xhtml", 
-    SA: "https://account.ezyreg.sa.gov.au/account/check-registration.htm", 
-    WA: "https://online.transport.wa.gov.au/webExternal/registration/", 
-    TAS: "https://www.transport.tas.gov.au/MRSWebInterface/public/regoLookup/registrationLookup.xhtml", 
-    ACT: "https://rego.act.gov.au/regosoawicket/public/reg/FindRegistrationPage", 
-    NT: "https://nt.gov.au/driving/rego/existing-nt-registration/rego-check", 
-    NHVR: "https://www.service.nhvr.gov.au/#page=informationHub/nHVASAVMSearch" 
-};
-
+const stateLinks = { VIC: "https://www.vicroads.vic.gov.au/registration/buy-sell-or-transfer-a-vehicle/check-vehicle-registration/vehicle-registration-enquiry", NSW: "https://check-registration.service.nsw.gov.au/?isLoginRequired=true", QLD: "https://www.service.transport.qld.gov.au/checkrego/application/VehicleSearch.xhtml", SA: "https://account.ezyreg.sa.gov.au/account/check-registration.htm", WA: "https://online.transport.wa.gov.au/webExternal/registration/", TAS: "https://www.transport.tas.gov.au/MRSWebInterface/public/regoLookup/registrationLookup.xhtml", ACT: "https://rego.act.gov.au/regosoawicket/public/reg/FindRegistrationPage", NT: "https://nt.gov.au/driving/rego/existing-nt-registration/rego-check", NHVR: "https://www.service.nhvr.gov.au/#page=informationHub/nHVASAVMSearch" };
 const shorthand = { 'V': 'VIC', 'N': 'NSW', 'Q': 'QLD', 'S': 'SA', 'W': 'WA', 'T': 'TAS', 'A': 'ACT', 'D': 'NT', 'H': 'NHVR' };
 
 const input = document.getElementById("regoInput");
 const historyPanel = document.getElementById("historyPanel");
 const stateGrid = document.getElementById("stateGrid");
 const toast = document.getElementById("toast");
+const paginationBar = document.getElementById("paginationBar");
+
 let history = JSON.parse(localStorage.getItem("regoHistory") || "[]");
 let currentPage = 1;
 const itemsPerPage = 12;
@@ -133,9 +141,8 @@ function copyWithToast(text, event) {
 function initButtons() {
     stateGrid.innerHTML = "";
     Object.keys(stateLinks).forEach(state => {
-        const key = Object.keys(shorthand).find(k => shorthand[k] === state);
         const li = document.createElement("li");
-        li.textContent = `${state} (${key})`; // Labels the shorthand for training
+        li.textContent = state; 
         li.onclick = (e) => openState(state, input.value.trim().split(" ")[0], e);
         stateGrid.appendChild(li);
     });
@@ -144,8 +151,9 @@ function initButtons() {
 function processInput() {
     let parts = input.value.toUpperCase().trim().split(" ");
     if (parts.length > 1 && shorthand[parts[1]]) {
-        navigator.clipboard.writeText(parts[0]).then(() => {
-            openState(shorthand[parts[1]], parts[0], { target: input });
+        const rego = parts[0];
+        navigator.clipboard.writeText(rego).then(() => {
+            openState(shorthand[parts[1]], rego, { target: input });
             input.value = "";
         });
     }
@@ -159,7 +167,6 @@ function openState(state, rego, event) {
         const dateKey = `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()}`;
         const timeStr = `${d.getHours()}:${String(d.getMinutes()).padStart(2,'0')}`;
         
-        // Don't add if it's identical to the most recent
         if(history.length === 0 || history[0].rego !== rego.toUpperCase() || history[0].state !== state) {
             history.unshift({ rego: rego.toUpperCase(), state, time: timeStr, date: dateKey });
             localStorage.setItem("regoHistory", JSON.stringify(history));
@@ -171,6 +178,8 @@ function openState(state, rego, event) {
 
 function renderHistory() {
     historyPanel.innerHTML = "";
+    paginationBar.style.display = (history.length > itemsPerPage) ? "flex" : "none";
+
     const start = (currentPage - 1) * itemsPerPage;
     const paginated = history.slice(start, start + itemsPerPage);
     
@@ -199,8 +208,18 @@ function renderHistory() {
     document.getElementById("nextBtn").disabled = (start + itemsPerPage >= history.length);
 }
 
-function changePage(dir) { currentPage += dir; renderHistory(); }
-function deleteHistory(i) { history.splice(i, 1); localStorage.setItem("regoHistory", JSON.stringify(history)); renderHistory(); }
+function changePage(dir) { 
+    currentPage += dir; 
+    renderHistory(); 
+    historyPanel.scrollTop = 0;
+}
+
+function deleteHistory(i) { 
+    history.splice(i, 1); 
+    if ((currentPage - 1) * itemsPerPage >= history.length && currentPage > 1) currentPage--;
+    localStorage.setItem("regoHistory", JSON.stringify(history)); 
+    renderHistory(); 
+}
 
 input.addEventListener("input", processInput);
 const toggle = document.getElementById("themeToggle");
@@ -210,7 +229,6 @@ toggle.addEventListener("change", () => {
     localStorage.setItem("theme", mode);
 });
 
-// Set theme on load
 const savedTheme = localStorage.getItem("theme") || "light";
 document.documentElement.setAttribute("data-theme", savedTheme);
 toggle.checked = (savedTheme === "dark");
