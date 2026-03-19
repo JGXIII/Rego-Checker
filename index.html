@@ -37,6 +37,7 @@ main{ display:flex; justify-content:center; padding:1.5rem; gap:1.5rem; max-widt
 input[type="text"]{
     width:100%; padding:0.9rem; font-size:1.2rem; border:3px solid var(--primary); 
     border-radius:10px; background:var(--card); color:var(--text); font-weight:bold; text-transform:uppercase; box-sizing: border-box;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
 }
 
 #stateGrid{ display:grid; grid-template-columns: repeat(3, 1fr); gap:0.5rem; padding:0; list-style:none; margin-top:1rem; }
@@ -65,8 +66,8 @@ input[type="text"]{
     width:18px; height:18px; border-radius:50%; border:none; 
     background:#d0d5db; color: #333; font-size: 9px; 
     display: flex; align-items: center; justify-content: center; 
-    transition: background-color 0.15s ease, color 0.15s ease, transform 0.1s ease;
-    cursor: pointer; /* Added pointer cursor */
+    transition: all 0.15s ease;
+    cursor: pointer;
 }
 .deleteBtn:hover { background-color: var(--danger); color: white; }
 .deleteBtn:active { transform: scale(0.9); }
@@ -118,9 +119,9 @@ input:checked + .slider:before{ transform:translateX(16px); }
         <div class="history-header">HISTORY</div>
         <div id="historyPanel"></div>
         <div class="pagination" id="paginationBar">
-            <button id="prevBtn" onclick="changePage(-1)">&#8592;</button>
+            <button id="prevBtn" onclick="changePage(-1)" title="Previous Page">&#8592;</button>
             <span id="pageLabel">Page 1</span>
-            <button id="nextBtn" onclick="changePage(1)">&#8594;</button>
+            <button id="nextBtn" onclick="changePage(1)" title="Next Page">&#8594;</button>
         </div>
     </div>
 </main>
@@ -141,25 +142,30 @@ let history = JSON.parse(localStorage.getItem("regoHistory") || "[]");
 let currentPage = 1;
 const itemsPerPage = 12;
 
-// GLOBAL KEY LISTENER: Forces focus to input box as soon as user types
 document.addEventListener('keydown', (e) => {
-    // Ignore if user is using control keys or if they are already in the input
     if (e.ctrlKey || e.altKey || e.metaKey || document.activeElement === input) return;
-    // Don't trigger if it's a non-character key (like Shift or CapsLock)
-    if (e.key.length === 1) {
-        input.focus();
-    }
+    if (e.key.length === 1) input.focus();
 });
 
-function copyWithToast(text, event) {
+async function copyWithToast(text, event) {
     if (!text) return;
-    navigator.clipboard.writeText(text.toUpperCase()).then(() => {
-        const rect = event.target.getBoundingClientRect();
-        toast.style.top = `${rect.top}px`;
-        toast.style.left = `${rect.right + 10}px`;
-        toast.classList.add("show");
-        setTimeout(() => toast.classList.remove("show"), 1000);
-    });
+    const val = text.toUpperCase();
+    try {
+        await navigator.clipboard.writeText(val);
+    } catch (err) {
+        // Fallback for non-secure contexts
+        const el = document.createElement('textarea');
+        el.value = val;
+        document.body.appendChild(el);
+        el.select();
+        document.execCommand('copy');
+        document.body.removeChild(el);
+    }
+    const rect = event.target.getBoundingClientRect();
+    toast.style.top = `${rect.top}px`;
+    toast.style.left = `${rect.right + 10}px`;
+    toast.classList.add("show");
+    setTimeout(() => toast.classList.remove("show"), 1000);
 }
 
 function initButtons() {
@@ -167,25 +173,28 @@ function initButtons() {
     Object.keys(stateLinks).forEach(state => {
         const li = document.createElement("li");
         li.textContent = state; 
-        li.onclick = (e) => openState(state, input.value.trim().split(" ")[0], e);
+        li.title = `Search in ${state}`;
+        li.onclick = (e) => openState(state, input.value.trim().split(/\s+/).slice(0, -1).join(" ") || input.value.trim(), e);
         stateGrid.appendChild(li);
     });
 }
 
 function processInput() {
-    let parts = input.value.toUpperCase().trim().split(" ");
-    if (parts.length > 1 && shorthand[parts[1]]) {
-        const rego = parts[0];
-        navigator.clipboard.writeText(rego).then(() => {
-            openState(shorthand[parts[1]], rego, { target: input });
+    const raw = input.value.toUpperCase().trim();
+    const parts = raw.split(/\s+/);
+    if (parts.length > 1) {
+        const lastPart = parts[parts.length - 1];
+        if (shorthand[lastPart]) {
+            const rego = parts.slice(0, -1).join(" ");
+            openState(shorthand[lastPart], rego, { target: input });
             input.value = "";
-        });
+        }
     }
 }
 
 function openState(state, rego, event) {
     window.open(stateLinks[state], '_blank');
-    if (rego) {
+    if (rego && rego.length > 1) {
         copyWithToast(rego, event);
         const d = new Date();
         const dateKey = `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()}`;
@@ -215,7 +224,7 @@ function renderHistory() {
         }
         const row = document.createElement("div");
         row.className = "listItem";
-        row.innerHTML = `<button class="deleteBtn" onclick="deleteHistory(${start + i})">✕</button>
+        row.innerHTML = `<button class="deleteBtn" onclick="deleteHistory(${start + i})" title="Delete entry">✕</button>
             <div>
                 <a class="rego-link" onclick="openState('${item.state}', '${item.rego}', event)">${item.rego}</a>
                 <br><span class="date-text">${item.state} • ${item.time}</span>
