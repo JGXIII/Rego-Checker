@@ -6,7 +6,6 @@
 <title>CHECK VEHICLE REGISTRATION</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22%23006400%22><path d=%22M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.22.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM5 11l1.5-4.5h11L19 11H5z%22/></svg>">
 <style>
-/* Theme Defaults (Dark Mode) */
 :root {
     --bg:#0d1117; --text:#f0f0f0; --card:#161b22;
     --primary:#ffffff; --secondary-bg:#1c293a;
@@ -53,7 +52,6 @@ input[type="text"]{
 #stateGrid li:hover{ background:var(--accent); color:white; border-color: var(--accent); }
 #stateGrid li:active{ transform: scale(0.95); }
 
-/* Tighter Date Grouping */
 .date-group-header { 
     font-size: 0.7rem; font-weight: 900; color: var(--accent); 
     padding: 12px 12px 6px 12px; text-transform: uppercase; 
@@ -63,7 +61,7 @@ input[type="text"]{
     display:grid; grid-template-columns: 24px 1fr auto; align-items:center;
     background:var(--secondary-bg); padding: 0.6rem 0.8rem;
     gap:8px; border-left: 4px solid var(--accent);
-    border-bottom: 1px solid var(--border); /* Subtle separator */
+    border-bottom: 1px solid var(--border);
 }
 .listItem:last-child { border-bottom: none; }
 
@@ -156,7 +154,12 @@ let history = JSON.parse(localStorage.getItem("regoHistory") || "[]");
 let currentPage = 1;
 const itemsPerPage = 12;
 
+// GLOBAL LISTENER: Catch typing and Ctrl+V
 document.addEventListener('keydown', (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'v') {
+        if (document.activeElement !== input) input.focus();
+        return;
+    }
     if (e.ctrlKey || e.altKey || e.metaKey || document.activeElement === input) return;
     if (e.key.length === 1) input.focus();
 });
