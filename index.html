@@ -33,9 +33,9 @@ main{ display:flex; justify-content:center; padding:1.5rem; gap:1.5rem; max-widt
 #leftPanel{ flex:1; min-width: 300px; }
 #sidePanel{ width:360px; background:var(--card); border:2px solid var(--primary); border-radius:10px; height:100%; display:flex; flex-direction:column; position: relative; box-shadow: 0 4px 15px rgba(0,0,0,0.3); overflow: hidden; }
 
-/* Tactile Buttons */
-button, li, .rego-link { transition: transform 0.05s ease, filter 0.1s ease; cursor: pointer; }
-button:active, li:active { transform: scale(0.94); filter: brightness(1.2); }
+/* Interactive Elements */
+button, li, .rego-link, .deleteBtn { transition: all 0.1s ease; cursor: pointer; }
+button:active, li:active { transform: scale(0.94); }
 
 #regoInput{
     width:100%; padding:0.9rem; font-size:1.2rem; border:3px solid var(--primary); 
@@ -56,14 +56,21 @@ button:active, li:active { transform: scale(0.94); filter: brightness(1.2); }
 #historyPanel::-webkit-scrollbar { display: none; }
 
 .listItem{ display:grid; grid-template-columns: 24px 1fr auto; align-items:center; background:var(--secondary-bg); padding: 0.6rem 0.8rem; gap:8px; border-left: 4px solid var(--accent); border-bottom: 1px solid var(--border); }
-.rego-link { font-size: 0.95rem; font-weight: 800; color: var(--primary); text-transform: uppercase; text-decoration: none; }
-.date-text { font-size: 0.65rem; color: #aaa; font-weight: 600; }
 
+/* Rego Link Hover Fixed */
+.rego-link { font-size: 0.95rem; font-weight: 800; color: var(--primary); text-transform: uppercase; text-decoration: none; display: inline-block; }
+.rego-link:hover { color: var(--accent); }
+
+.date-text { font-size: 0.65rem; color: #aaa; font-weight: 600; pointer-events: none; }
+
+/* Delete Button Hover Fixed */
 .deleteBtn{ width:22px; height:22px; border-radius:50%; border:none; background:#444; color: #fff; font-size: 10px; display: flex; align-items: center; justify-content: center; }
-.deleteBtn:active { background: var(--danger); transform: scale(0.85); }
-.copyBtn{ background:var(--accent); color:white; border:none; padding: 6px 10px; border-radius:5px; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; }
+.deleteBtn:hover { background: var(--danger); color: white; }
 
-/* Navigation & Grey Out */
+.copyBtn{ background:var(--accent); color:white; border:none; padding: 6px 10px; border-radius:5px; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; }
+.copyBtn:hover { filter: brightness(1.1); }
+
+/* Navigation */
 .pagination { display: none; justify-content: space-between; align-items: center; padding: 10px 15px; background: var(--secondary-bg); border-top: 2px solid var(--accent); flex-shrink: 0; }
 .pagination button { background: var(--accent); color: white; border: none; width: 45px; height: 35px; border-radius: 6px; font-size: 1.3rem; font-weight: bold; position: relative; }
 .pagination button:disabled { background: var(--disabled); color: #888; cursor: not-allowed; transform: none; filter: grayscale(1); }
@@ -90,7 +97,7 @@ button:active, li:active { transform: scale(0.94); filter: brightness(1.2); }
 input:checked + .slider{ background:var(--accent); }
 input:checked + .slider:before{ transform:translateX(16px); }
 
-/* MOBILE RESPONSIVE FIX */
+/* Mobile Layout Fix */
 @media (max-width: 800px) {
     main { flex-direction: column; height: auto; overflow-y: visible; }
     #sidePanel { width: 100%; height: 500px; margin-top: 1rem; }
@@ -237,7 +244,6 @@ function renderHistory() {
     const today = getTodayString();
     dateDisplay.textContent = (targetDate === today) ? "TODAY" : targetDate;
 
-    // Fix: Dynamic Grey-out logic
     const olderBtn = document.getElementById("olderBtn");
     const newerBtn = document.getElementById("newerBtn");
     
@@ -251,7 +257,7 @@ function renderHistory() {
         const originalIndex = history.findIndex(h => h === item);
         const row = document.createElement("div");
         row.className = "listItem";
-        row.innerHTML = `<button class="deleteBtn" onclick="deleteHistory(${originalIndex})">✕</button>
+        row.innerHTML = `<button class="deleteBtn" onclick="deleteHistory(${originalIndex})" title="Remove">✕</button>
             <div>
                 <a class="rego-link" onclick="openState('${item.state}', '${item.rego}', event)">${item.rego}</a>
                 <br><span class="date-text">${item.state} • ${item.time}</span>
