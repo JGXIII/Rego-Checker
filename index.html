@@ -59,14 +59,21 @@ input[type="text"]{
 .deleteBtn{ width:18px; height:18px; border-radius:50%; border:none; background:#444; color: #fff; font-size: 9px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
 .copyBtn{ background:var(--accent); color:white; border:none; padding: 5px 9px; border-radius:5px; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; cursor: pointer; }
 
-/* Timeline Pagination */
-.pagination { display: none; grid-template-columns: 1fr 1fr 1fr; align-items: center; padding: 10px 5px; background: var(--secondary-bg); border-top: 2px solid var(--accent); flex-shrink: 0; }
-.pagination button { background: var(--accent); color: white; border: none; padding: 6px 4px; border-radius: 4px; font-size: 0.65rem; font-weight: bold; cursor: pointer; text-transform: uppercase; white-space: nowrap; overflow: hidden; }
-.pagination button:disabled { background: transparent; color: transparent; cursor: default; pointer-events: none; }
-#dateDisplay { font-size: 0.7rem; font-weight: 900; color: var(--primary); text-transform: uppercase; text-align: center; }
+/* Navigation */
+.pagination { display: none; justify-content: space-between; align-items: center; padding: 10px 15px; background: var(--secondary-bg); border-top: 2px solid var(--accent); flex-shrink: 0; position: relative; }
+.pagination button { background: var(--accent); color: white; border: none; width: 40px; height: 35px; border-radius: 6px; font-size: 1.2rem; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; position: relative; }
+.pagination button:disabled { background: transparent; color: transparent; cursor: default; }
+
+/* Floating Tooltip */
+.nav-tip { position: absolute; bottom: 50px; background: var(--accent); color: white; padding: 4px 8px; border-radius: 4px; font-size: 0.65rem; font-weight: bold; white-space: nowrap; pointer-events: none; opacity: 0; transition: opacity 0.2s; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
+.pagination button:hover .nav-tip { opacity: 1; }
+#newerTip { left: 5px; }
+#olderTip { right: 5px; }
+
+#dateDisplay { font-size: 0.75rem; font-weight: 900; color: var(--primary); text-transform: uppercase; text-align: center; }
 
 #setupOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); z-index: 2000; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; color: var(--text); padding: 20px; box-sizing: border-box; }
-#setupOverlay button { background: var(--heading-green); color: white; border: none; padding: 20px 40px; font-size: 1.5rem; font-weight: bold; border-radius: 12px; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.4); }
+#setupOverlay button { background: var(--heading-green); color: white; border: none; padding: 20px 40px; font-size: 1.3rem; font-weight: bold; border-radius: 12px; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.4); }
 
 #toast { position: fixed; background: #333; color: #fff; padding: 5px 10px; border-radius: 5px; font-size: 0.75rem; font-weight: bold; opacity: 0; transition: opacity 0.2s; pointer-events: none; z-index: 1000; border: 1px solid var(--accent); }
 #toast.show { opacity: 1; }
@@ -82,8 +89,8 @@ input:checked + .slider:before{ transform:translateX(16px); }
 <body>
 
 <div id="setupOverlay" style="display:none;">
-    <p style="margin-bottom: 25px;">To enable <b>Auto-Copy</b> and search shortcuts,<br>please click below to allow browser permissions.</p>
-    <button onclick="dismissSetup()">ALLOW & START</button>
+    <p style="margin-bottom: 25px; font-weight: bold;">To enable auto-copy registration,<br>please click allow below to start.</p>
+    <button onclick="forcePermission()">ALLOW & START</button>
 </div>
 
 <header>
@@ -103,9 +110,13 @@ input:checked + .slider:before{ transform:translateX(16px); }
         <div class="history-header">HISTORY</div>
         <div id="historyPanel"></div>
         <div class="pagination" id="paginationBar">
-            <button id="newerBtn" onclick="changeDate(-1)">Newer</button>
+            <button id="newerBtn" onclick="changeDate(-1)">
+                &#8592; <span id="newerTip" class="nav-tip"></span>
+            </button>
             <div id="dateDisplay">Date</div>
-            <button id="olderBtn" onclick="changeDate(1)">Older</button>
+            <button id="olderBtn" onclick="changeDate(1)">
+                &#8594; <span id="olderTip" class="nav-tip"></span>
+            </button>
         </div>
     </div>
 </main>
@@ -126,28 +137,35 @@ const dateDisplay = document.getElementById("dateDisplay");
 let history = JSON.parse(localStorage.getItem("regoHistory") || "[]");
 let dateIndex = 0;
 
-// 1. Permission Handler (The Chrome/Edge Silver Bullet)
+// THE PERMISSION FIX
 if (!localStorage.getItem("setupDone")) {
     document.getElementById("setupOverlay").style.display = "flex";
 }
-async function dismissSetup() {
-    // Attempting to read/write explicitly via Permissions API usually forces the browser prompt
+
+async function forcePermission() {
     try {
-        const queryOpts = { name: 'clipboard-write', allowWithoutGesture: false };
-        await navigator.permissions.query(queryOpts);
-        await navigator.clipboard.writeText("REGO_READY");
-        localStorage.setItem("setupDone", "true");
-        document.getElementById("setupOverlay").style.display = "none";
-        input.focus();
+        // Method 1: Modern API write
+        await navigator.clipboard.writeText(" ");
+        completeSetup();
     } catch (err) {
-        // Fallback for older browsers
-        localStorage.setItem("setupDone", "true");
-        document.getElementById("setupOverlay").style.display = "none";
-        input.focus();
+        // Method 2: Legacy fallback (forces prompt in some Edge versions)
+        const el = document.createElement('textarea');
+        el.value = ' ';
+        document.body.appendChild(el);
+        el.select();
+        const success = document.execCommand('copy');
+        document.body.removeChild(el);
+        if(success) completeSetup();
     }
 }
 
-// 2. Global Key Listener
+function completeSetup() {
+    localStorage.setItem("setupDone", "true");
+    document.getElementById("setupOverlay").style.display = "none";
+    input.focus();
+}
+
+// Global Key Listeners
 document.addEventListener('keydown', (e) => {
     if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'v') {
         if (document.activeElement !== input) input.focus();
@@ -217,7 +235,7 @@ function openState(state, rego, event) {
 function renderHistory() {
     historyPanel.innerHTML = "";
     if (history.length === 0) { paginationBar.style.display = "none"; return; }
-    paginationBar.style.display = "grid";
+    paginationBar.style.display = "flex";
 
     const uniqueDates = [...new Set(history.map(item => item.date))];
     if (dateIndex >= uniqueDates.length) dateIndex = uniqueDates.length - 1;
@@ -227,13 +245,15 @@ function renderHistory() {
     const today = getTodayString();
     dateDisplay.textContent = (targetDate === today) ? "TODAY" : targetDate;
 
-    // Button Labels
+    // Button Tips & Logic
     const olderBtn = document.getElementById("olderBtn");
     const newerBtn = document.getElementById("newerBtn");
+    const olderTip = document.getElementById("olderTip");
+    const newerTip = document.getElementById("newerTip");
 
     if (dateIndex < uniqueDates.length - 1) {
         olderBtn.disabled = false;
-        olderBtn.textContent = `To ${uniqueDates[dateIndex+1]}`;
+        olderTip.textContent = `Go to ${uniqueDates[dateIndex+1]}`;
     } else {
         olderBtn.disabled = true;
     }
@@ -241,7 +261,7 @@ function renderHistory() {
     if (dateIndex > 0) {
         newerBtn.disabled = false;
         const nextLabel = uniqueDates[dateIndex-1];
-        newerBtn.textContent = (nextLabel === today) ? "To Today" : `To ${nextLabel}`;
+        newerTip.textContent = (nextLabel === today) ? "Go to Today" : `Go to ${nextLabel}`;
     } else {
         newerBtn.disabled = true;
     }
