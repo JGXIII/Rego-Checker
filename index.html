@@ -32,9 +32,9 @@ main{ display:flex; justify-content:center; padding:1.5rem; gap:1.5rem; max-widt
 #leftPanel{ flex:1; }
 #sidePanel{ width:360px; background:var(--card); border:2px solid var(--primary); border-radius:10px; height:100%; display:flex; flex-direction:column; position: relative; box-shadow: 0 4px 15px rgba(0,0,0,0.3); overflow: hidden; }
 
-/* Clickable elements satisfaction */
-button, li, .rego-link { transition: transform 0.1s ease, filter 0.1s ease; cursor: pointer; }
-button:active, li:active { transform: scale(0.92) !important; filter: brightness(1.2); }
+/* Tactile Button Effects */
+button, li, .rego-link { transition: transform 0.05s cubic-bezier(0.4, 0, 0.2, 1), filter 0.1s ease; cursor: pointer; }
+button:active, li:active { transform: scale(0.94); filter: brightness(1.2); }
 
 .history-header { padding: 0.7rem; border-bottom: 2px solid var(--accent); font-weight: bold; text-align: center; background: var(--secondary-bg); color: var(--primary); font-size: 0.85rem; letter-spacing: 1px; flex-shrink: 0; }
 #historyPanel { flex:1; overflow-y: auto; padding: 0; scrollbar-width: none; -ms-overflow-style: none; }
@@ -56,17 +56,16 @@ input[type="text"]{
 
 .listItem{ display:grid; grid-template-columns: 24px 1fr auto; align-items:center; background:var(--secondary-bg); padding: 0.6rem 0.8rem; gap:8px; border-left: 4px solid var(--accent); border-bottom: 1px solid var(--border); }
 .rego-link { font-size: 0.95rem; font-weight: 800; color: var(--primary); text-transform: uppercase; text-decoration: none; display: inline-block; }
-.rego-link:hover { color: var(--accent); }
 .date-text { font-size: 0.65rem; color: #aaa; font-weight: 600; }
 
 .deleteBtn{ width:22px; height:22px; border-radius:50%; border:none; background:#444; color: #fff; font-size: 10px; display: flex; align-items: center; justify-content: center; }
-.deleteBtn:hover { background: var(--danger); }
+.deleteBtn:active { background: var(--danger); transform: scale(0.85); }
 .copyBtn{ background:var(--accent); color:white; border:none; padding: 6px 10px; border-radius:5px; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; }
 
 /* Navigation & Tooltips */
 .pagination { display: none; justify-content: space-between; align-items: center; padding: 10px 15px; background: var(--secondary-bg); border-top: 2px solid var(--accent); flex-shrink: 0; }
 .pagination button { background: var(--accent); color: white; border: none; width: 45px; height: 35px; border-radius: 6px; font-size: 1.3rem; font-weight: bold; position: relative; }
-.pagination button:disabled { background: transparent; color: transparent; cursor: default; transform: none !important; }
+.pagination button:disabled { opacity: 0; pointer-events: none; }
 
 .nav-tip { position: absolute; bottom: 50px; background: #333; color: white; padding: 5px 10px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; white-space: nowrap; pointer-events: none; opacity: 0; transition: opacity 0.2s; border: 1px solid var(--accent); z-index: 10; }
 .pagination button:hover .nav-tip { opacity: 1; }
@@ -74,11 +73,10 @@ input[type="text"]{
 #olderTip { right: 0; }
 #dateDisplay { font-size: 0.75rem; font-weight: 900; color: var(--primary); text-transform: uppercase; }
 
-/* The Splash Screen */
+/* Splash Screen Fix */
 #setupOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); z-index: 2000; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; color: var(--text); padding: 40px; box-sizing: border-box; }
-#setupOverlay h2 { color: var(--heading-green); margin-bottom: 10px; }
-#setupOverlay p { line-height: 1.6; font-size: 1.1rem; max-width: 400px; margin-bottom: 30px; }
-#setupOverlay button { background: var(--heading-green); color: white; border: none; padding: 22px 45px; font-size: 1.4rem; font-weight: 900; border-radius: 15px; box-shadow: 0 10px 20px rgba(0,0,0,0.4); }
+#setupOverlay p { line-height: 1.6; font-size: 1.2rem; max-width: 450px; margin-bottom: 35px; font-weight: 600; }
+#setupOverlay button { background: var(--heading-green); color: white; border: none; padding: 25px 50px; font-size: 1.5rem; font-weight: 900; border-radius: 15px; box-shadow: 0 8px 20px rgba(0,0,0,0.5); }
 
 #toast { position: fixed; background: #333; color: #fff; padding: 5px 10px; border-radius: 5px; font-size: 0.75rem; font-weight: bold; opacity: 0; transition: opacity 0.2s; pointer-events: none; z-index: 1000; border: 1px solid var(--accent); }
 #toast.show { opacity: 1; }
@@ -94,9 +92,8 @@ input:checked + .slider:before{ transform:translateX(16px); }
 <body>
 
 <div id="setupOverlay" style="display:none;">
-    <h2>Permission Required</h2>
-    <p>To enable <b>auto-copy registration</b> and <b>instant shortcuts</b>, please click the button below and select <b>"Allow"</b> when prompted by your browser.</p>
-    <button onclick="forceEnableClipboard()">ENABLE & START</button>
+    <p>To enable auto-copy registration,<br>please click allow below to start.</p>
+    <button onclick="triggerPermissionPrompt()">ALLOW & START</button>
 </div>
 
 <header>
@@ -143,31 +140,31 @@ const dateDisplay = document.getElementById("dateDisplay");
 let history = JSON.parse(localStorage.getItem("regoHistory") || "[]");
 let dateIndex = 0;
 
-// THE PERMISSION ENGINE
-if (!localStorage.getItem("rego_setup_complete")) {
+// THE PERMISSION TRIGGER
+if (!localStorage.getItem("clipboard_allowed")) {
     document.getElementById("setupOverlay").style.display = "flex";
 }
 
-async function forceEnableClipboard() {
-    // 1. Try modern write (triggers prompt in 99% of cases)
+async function triggerPermissionPrompt() {
     try {
-        await navigator.clipboard.writeText("REGO_ACTIVE");
+        // We attempt to READ the clipboard. 
+        // This is what forces the "Allow regochecker to see text and images..." popup.
+        await navigator.clipboard.readText();
         finishSetup();
     } catch (e) {
-        // 2. Legacy fallback
-        const t = document.createElement("textarea");
-        t.value = "REGO_ACTIVE";
-        document.body.appendChild(t);
-        t.select();
-        if (document.execCommand("copy")) {
+        // If they haven't allowed it yet, we attempt a write as well to be sure
+        try {
+            await navigator.clipboard.writeText(" ");
+            finishSetup();
+        } catch (err) {
+            // Fallback for browsers that require a manual paste event
             finishSetup();
         }
-        document.body.removeChild(t);
     }
 }
 
 function finishSetup() {
-    localStorage.setItem("rego_setup_complete", "true");
+    localStorage.setItem("clipboard_allowed", "true");
     document.getElementById("setupOverlay").style.display = "none";
     input.focus();
 }
@@ -185,8 +182,15 @@ document.addEventListener('keydown', (e) => {
 async function copyWithToast(text, event) {
     if (!text) return;
     const val = text.toUpperCase();
-    try { await navigator.clipboard.writeText(val); } catch (err) {
-        const el = document.createElement('textarea'); el.value = val; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el);
+    try { 
+        await navigator.clipboard.writeText(val); 
+    } catch (err) {
+        const el = document.createElement('textarea'); 
+        el.value = val; 
+        document.body.appendChild(el); 
+        el.select(); 
+        document.execCommand('copy'); 
+        document.body.removeChild(el);
     }
     const rect = (event && event.target) ? event.target.getBoundingClientRect() : {top: 0, right: 0};
     toast.style.top = `${rect.top}px`; toast.style.left = `${rect.right + 10}px`;
