@@ -68,7 +68,6 @@ button:active, li:active { transform: scale(0.94); }
 .pagination button { background: var(--accent); color: white; border: none; width: 45px; height: 35px; border-radius: 6px; font-size: 1.3rem; font-weight: bold; position: relative; }
 .pagination button:disabled { background: var(--disabled); color: #888; cursor: not-allowed; transform: none; filter: grayscale(1); }
 
-/* Navigation Tips */
 .nav-tip { position: absolute; bottom: 50px; background: #333; color: white; padding: 5px 10px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; white-space: nowrap; pointer-events: none; opacity: 0; transition: opacity 0.2s; border: 1px solid var(--accent); z-index: 10; }
 .pagination button:not(:disabled):hover .nav-tip { opacity: 1; }
 #newerTip { left: 0; }
@@ -148,9 +147,12 @@ const dateDisplay = document.getElementById("dateDisplay");
 let history = JSON.parse(localStorage.getItem("regoHistory") || "[]");
 let dateIndex = 0;
 
+// Optimized Keydown Listener
 document.addEventListener('keydown', (e) => {
     if (e.target.tagName === 'INPUT' || e.ctrlKey || e.metaKey || e.altKey) return;
-    if (e.key.length === 1) { input.focus(); }
+    if (e.key.length === 1 && e.key !== ' ') { 
+        input.focus(); 
+    }
 });
 
 if (!localStorage.getItem("clipboard_allowed")) {
@@ -231,9 +233,11 @@ function openState(state, rego, event) {
 function renderHistory() {
     historyPanel.innerHTML = "";
     if (history.length === 0) { paginationBar.style.display = "none"; return; }
-    paginationBar.style.display = "flex";
-
+    
     const uniqueDates = [...new Set(history.map(item => item.date))];
+    if (uniqueDates.length === 0) { paginationBar.style.display = "none"; return; }
+    
+    paginationBar.style.display = "flex";
     if (dateIndex >= uniqueDates.length) dateIndex = uniqueDates.length - 1;
     if (dateIndex < 0) dateIndex = 0;
 
@@ -243,13 +247,19 @@ function renderHistory() {
 
     const olderBtn = document.getElementById("olderBtn");
     const newerBtn = document.getElementById("newerBtn");
+    const olderTip = document.getElementById("olderTip");
+    const newerTip = document.getElementById("newerTip");
     
     olderBtn.disabled = (dateIndex >= uniqueDates.length - 1);
     newerBtn.disabled = (dateIndex <= 0);
 
-    // Restore Tooltip Logic
-    if(!olderBtn.disabled) document.getElementById("olderTip").textContent = `Go to ${uniqueDates[dateIndex+1]}`;
-    if(!newerBtn.disabled) document.getElementById("newerTip").textContent = (uniqueDates[dateIndex-1] === today) ? "Go to Today" : `Go to ${uniqueDates[dateIndex-1]}`;
+    // Safety check for tooltips
+    if(!olderBtn.disabled && uniqueDates[dateIndex+1]) {
+        olderTip.textContent = `Go to ${uniqueDates[dateIndex+1]}`;
+    }
+    if(!newerBtn.disabled && uniqueDates[dateIndex-1]) {
+        newerTip.textContent = (uniqueDates[dateIndex-1] === today) ? "Go to Today" : `Go to ${uniqueDates[dateIndex-1]}`;
+    }
 
     history.filter(item => item.date === targetDate).forEach((item) => {
         const originalIndex = history.findIndex(h => h === item);
@@ -265,8 +275,17 @@ function renderHistory() {
     });
 }
 
-function changeDate(dir) { dateIndex += dir; renderHistory(); historyPanel.scrollTop = 0; }
-function deleteHistory(i) { history.splice(i, 1); localStorage.setItem("regoHistory", JSON.stringify(history)); renderHistory(); }
+function changeDate(dir) { 
+    dateIndex += dir; 
+    renderHistory(); 
+    historyPanel.scrollTo({top: 0, behavior: 'smooth'}); 
+}
+
+function deleteHistory(i) { 
+    history.splice(i, 1); 
+    localStorage.setItem("regoHistory", JSON.stringify(history)); 
+    renderHistory(); 
+}
 
 input.addEventListener("input", processInput);
 const themeToggle = document.getElementById("themeToggle");
