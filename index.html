@@ -68,8 +68,12 @@ button:active, li:active { transform: scale(0.94); }
 .pagination button { background: var(--accent); color: white; border: none; width: 45px; height: 35px; border-radius: 6px; font-size: 1.3rem; font-weight: bold; position: relative; }
 .pagination button:disabled { background: var(--disabled); color: #888; cursor: not-allowed; transform: none; filter: grayscale(1); }
 
+/* Navigation Tips */
 .nav-tip { position: absolute; bottom: 50px; background: #333; color: white; padding: 5px 10px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; white-space: nowrap; pointer-events: none; opacity: 0; transition: opacity 0.2s; border: 1px solid var(--accent); z-index: 10; }
 .pagination button:not(:disabled):hover .nav-tip { opacity: 1; }
+#newerTip { left: 0; }
+#olderTip { right: 0; }
+
 #dateDisplay { font-size: 0.75rem; font-weight: 900; color: var(--primary); text-transform: uppercase; }
 
 #setupOverlay { position: fixed; inset: 0; background: var(--bg); z-index: 2000; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; }
@@ -117,9 +121,13 @@ input:checked + .slider:before{ transform:translateX(16px); }
         <div class="history-header">HISTORY</div>
         <div id="historyPanel"></div>
         <div class="pagination" id="paginationBar">
-            <button id="newerBtn" onclick="changeDate(-1)">&#8592; <span id="newerTip" class="nav-tip"></span></button>
+            <button id="newerBtn" onclick="changeDate(-1)">
+                &#8592; <span id="newerTip" class="nav-tip"></span>
+            </button>
             <div id="dateDisplay">Date</div>
-            <button id="olderBtn" onclick="changeDate(1)">&#8594; <span id="olderTip" class="nav-tip"></span></button>
+            <button id="olderBtn" onclick="changeDate(1)">
+                &#8594; <span id="olderTip" class="nav-tip"></span>
+            </button>
         </div>
     </div>
 </main>
@@ -140,14 +148,9 @@ const dateDisplay = document.getElementById("dateDisplay");
 let history = JSON.parse(localStorage.getItem("regoHistory") || "[]");
 let dateIndex = 0;
 
-// GLOBAL FOCUS LOGIC
 document.addEventListener('keydown', (e) => {
-    // Don't interrupt if user is already in an input or using system shortcuts
     if (e.target.tagName === 'INPUT' || e.ctrlKey || e.metaKey || e.altKey) return;
-    // Only capture letters and numbers
-    if (e.key.length === 1) {
-        input.focus();
-    }
+    if (e.key.length === 1) { input.focus(); }
 });
 
 if (!localStorage.getItem("clipboard_allowed")) {
@@ -238,8 +241,15 @@ function renderHistory() {
     const today = getTodayString();
     dateDisplay.textContent = (targetDate === today) ? "TODAY" : targetDate;
 
-    document.getElementById("olderBtn").disabled = (dateIndex >= uniqueDates.length - 1);
-    document.getElementById("newerBtn").disabled = (dateIndex <= 0);
+    const olderBtn = document.getElementById("olderBtn");
+    const newerBtn = document.getElementById("newerBtn");
+    
+    olderBtn.disabled = (dateIndex >= uniqueDates.length - 1);
+    newerBtn.disabled = (dateIndex <= 0);
+
+    // Restore Tooltip Logic
+    if(!olderBtn.disabled) document.getElementById("olderTip").textContent = `Go to ${uniqueDates[dateIndex+1]}`;
+    if(!newerBtn.disabled) document.getElementById("newerTip").textContent = (uniqueDates[dateIndex-1] === today) ? "Go to Today" : `Go to ${uniqueDates[dateIndex-1]}`;
 
     history.filter(item => item.date === targetDate).forEach((item) => {
         const originalIndex = history.findIndex(h => h === item);
@@ -255,7 +265,7 @@ function renderHistory() {
     });
 }
 
-function changeDate(dir) { dateIndex += dir; renderHistory(); }
+function changeDate(dir) { dateIndex += dir; renderHistory(); historyPanel.scrollTop = 0; }
 function deleteHistory(i) { history.splice(i, 1); localStorage.setItem("regoHistory", JSON.stringify(history)); renderHistory(); }
 
 input.addEventListener("input", processInput);
