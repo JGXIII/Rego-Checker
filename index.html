@@ -52,49 +52,29 @@ input[type="text"]{
 #stateGrid li:hover{ background:var(--accent); color:white; border-color: var(--accent); }
 #stateGrid li:active{ transform: scale(0.95); }
 
-.date-group-header { 
-    font-size: 0.7rem; font-weight: 900; color: var(--accent); 
-    padding: 12px 12px 6px 12px; text-transform: uppercase; 
-    letter-spacing: 0.8px; background: var(--card);
-}
-.listItem{
-    display:grid; grid-template-columns: 24px 1fr auto; align-items:center;
-    background:var(--secondary-bg); padding: 0.6rem 0.8rem;
-    gap:8px; border-left: 4px solid var(--accent);
-    border-bottom: 1px solid var(--border);
-}
+.date-group-header { font-size: 0.7rem; font-weight: 900; color: var(--accent); padding: 12px 12px 6px 12px; text-transform: uppercase; letter-spacing: 0.8px; background: var(--card); }
+.listItem{ display:grid; grid-template-columns: 24px 1fr auto; align-items:center; background:var(--secondary-bg); padding: 0.6rem 0.8rem; gap:8px; border-left: 4px solid var(--accent); border-bottom: 1px solid var(--border); }
 .listItem:last-child { border-bottom: none; }
-
 .rego-link { font-size: 0.95rem; font-weight: 800; color: var(--primary); text-transform: uppercase; cursor: pointer; text-decoration: none; }
 .rego-link:hover { color: var(--accent); }
 .date-text { font-size: 0.65rem; color: #aaa; font-weight: 600; }
 [data-theme="light"] .date-text { color: #666; }
 
-.deleteBtn{ 
-    width:18px; height:18px; border-radius:50%; border:none; 
-    background:#444; color: #fff; font-size: 9px; 
-    display: flex; align-items: center; justify-content: center; 
-    transition: all 0.15s ease; cursor: pointer;
-}
+.deleteBtn{ width:18px; height:18px; border-radius:50%; border:none; background:#444; color: #fff; font-size: 9px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
 [data-theme="light"] .deleteBtn { background:#d0d5db; color:#333; }
 .deleteBtn:hover { background-color: var(--danger); color: white; }
-.deleteBtn:active { transform: scale(0.9); }
 
-.copyBtn{ background:var(--accent); color:white; border:none; padding: 5px 9px; border-radius:5px; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; cursor: pointer; transition: transform 0.1s; }
-.copyBtn:active { transform: scale(0.9); }
+.copyBtn{ background:var(--accent); color:white; border:none; padding: 5px 9px; border-radius:5px; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; cursor: pointer; }
 
-.pagination { 
-    display: none; 
-    justify-content: center; align-items: center; gap: 15px; 
-    padding: 10px; background: var(--secondary-bg); border-top: 2px solid var(--accent); 
-    flex-shrink: 0;
-}
-.pagination button { 
-    background: var(--accent); color: white; border: none; 
-    padding: 4px 14px; border-radius: 6px; font-size: 1.1rem; font-weight: bold; cursor: pointer; transition: transform 0.1s;
-}
-.pagination button:active { transform: scale(0.9); }
-.pagination button:disabled { background: #555; color: #888; cursor: not-allowed; transform: none; }
+/* Pagination Styles */
+.pagination { display: none; justify-content: center; align-items: center; gap: 10px; padding: 10px; background: var(--secondary-bg); border-top: 2px solid var(--accent); flex-shrink: 0; }
+.pagination button { background: var(--accent); color: white; border: none; padding: 4px 12px; border-radius: 6px; font-size: 1rem; font-weight: bold; cursor: pointer; }
+.pagination button:disabled { background: #555; cursor: not-allowed; }
+.jump-input { width: 45px; padding: 4px; border-radius: 4px; border: 1px solid var(--primary); background: var(--card); color: var(--text); text-align: center; font-weight: bold; font-size: 0.8rem; }
+
+/* Setup Overlay */
+#setupOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 2000; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; color: white; padding: 20px; box-sizing: border-box; }
+#setupOverlay button { background: var(--heading-green); color: white; border: none; padding: 15px 30px; font-size: 1.2rem; font-weight: bold; border-radius: 8px; cursor: pointer; margin-top: 20px; }
 
 #toast { position: fixed; background: #333; color: #fff; padding: 5px 10px; border-radius: 5px; font-size: 0.75rem; font-weight: bold; opacity: 0; transition: opacity 0.2s; pointer-events: none; z-index: 1000; border: 1px solid var(--accent); }
 #toast.show { opacity: 1; }
@@ -106,12 +86,14 @@ input[type="text"]{
 input:checked + .slider{ background:var(--accent); }
 input:checked + .slider:before{ transform:translateX(16px); }
 </style>
-<script>
-    const savedTheme = localStorage.getItem("theme") || "dark";
-    document.documentElement.setAttribute("data-theme", savedTheme);
-</script>
 </head>
 <body>
+
+<div id="setupOverlay" style="display:none;">
+    <h2>Welcome to RapidRego</h2>
+    <p>To enable the <b>Automatic Clipboard</b> feature, click the button below.</p>
+    <button onclick="dismissSetup()">ENABLE AUTO-COPY & START</button>
+</div>
 
 <header>
     <h1>CHECK VEHICLE REGISTRATION</h1>
@@ -130,9 +112,9 @@ input:checked + .slider:before{ transform:translateX(16px); }
         <div class="history-header">HISTORY</div>
         <div id="historyPanel"></div>
         <div class="pagination" id="paginationBar">
-            <button id="prevBtn" onclick="changePage(-1)" title="Previous Page">&#8592;</button>
-            <span id="pageLabel" style="font-weight:800; font-size:0.85rem; color:var(--primary);">Page 1</span>
-            <button id="nextBtn" onclick="changePage(1)" title="Next Page">&#8594;</button>
+            <button id="prevBtn" onclick="changePage(-1)">&#8592;</button>
+            <div style="font-size: 0.75rem; font-weight: 800;">PG <input type="number" id="jumpPage" class="jump-input" min="1"></div>
+            <button id="nextBtn" onclick="changePage(1)">&#8594;</button>
         </div>
     </div>
 </main>
@@ -148,13 +130,24 @@ const historyPanel = document.getElementById("historyPanel");
 const stateGrid = document.getElementById("stateGrid");
 const toast = document.getElementById("toast");
 const paginationBar = document.getElementById("paginationBar");
-const toggle = document.getElementById("themeToggle");
+const jumpPageInput = document.getElementById("jumpPage");
 
 let history = JSON.parse(localStorage.getItem("regoHistory") || "[]");
 let currentPage = 1;
 const itemsPerPage = 12;
 
-// GLOBAL LISTENER: Catch typing and Ctrl+V
+// CLIPBOARD PERMISSION LOGIC
+if (!localStorage.getItem("setupDone")) {
+    document.getElementById("setupOverlay").style.display = "flex";
+}
+function dismissSetup() {
+    navigator.clipboard.writeText("").then(() => {
+        localStorage.setItem("setupDone", "true");
+        document.getElementById("setupOverlay").style.display = "none";
+        input.focus();
+    });
+}
+
 document.addEventListener('keydown', (e) => {
     if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'v') {
         if (document.activeElement !== input) input.focus();
@@ -167,21 +160,12 @@ document.addEventListener('keydown', (e) => {
 async function copyWithToast(text, event) {
     if (!text) return;
     const val = text.toUpperCase();
-    try {
-        await navigator.clipboard.writeText(val);
-    } catch (err) {
-        const el = document.createElement('textarea');
-        el.value = val;
-        document.body.appendChild(el);
-        el.select();
-        document.execCommand('copy');
-        document.body.removeChild(el);
+    try { await navigator.clipboard.writeText(val); } catch (err) {
+        const el = document.createElement('textarea'); el.value = val; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el);
     }
-    const rect = event.target.getBoundingClientRect();
-    toast.style.top = `${rect.top}px`;
-    toast.style.left = `${rect.right + 10}px`;
-    toast.classList.add("show");
-    setTimeout(() => toast.classList.remove("show"), 1000);
+    const rect = (event && event.target) ? event.target.getBoundingClientRect() : {top: 0, right: 0};
+    toast.style.top = `${rect.top}px`; toast.style.left = `${rect.right + 10}px`;
+    toast.classList.add("show"); setTimeout(() => toast.classList.remove("show"), 1000);
 }
 
 function initButtons() {
@@ -189,7 +173,6 @@ function initButtons() {
     Object.keys(stateLinks).forEach(state => {
         const li = document.createElement("li");
         li.textContent = state; 
-        li.title = `Search in ${state}`;
         li.onclick = (e) => openState(state, input.value.trim().split(/\s+/).slice(0, -1).join(" ") || input.value.trim(), e);
         stateGrid.appendChild(li);
     });
@@ -214,8 +197,9 @@ function openState(state, rego, event) {
         copyWithToast(rego, event);
         const d = new Date();
         const dateKey = `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()}`;
-        const timeStr = `${d.getHours()}:${String(d.getMinutes()).padStart(2,'0')}`;
-        if(history.length === 0 || history.rego !== rego.toUpperCase() || history.state !== state) {
+        // LEADING ZERO FIX HERE
+        const timeStr = `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+        if(history.length === 0 || history[0].rego !== rego.toUpperCase() || history[0].state !== state) {
             history.unshift({ rego: rego.toUpperCase(), state, time: timeStr, date: dateKey });
             localStorage.setItem("regoHistory", JSON.stringify(history));
             renderHistory();
@@ -226,7 +210,9 @@ function openState(state, rego, event) {
 
 function renderHistory() {
     historyPanel.innerHTML = "";
+    const totalPages = Math.ceil(history.length / itemsPerPage) || 1;
     paginationBar.style.display = (history.length > itemsPerPage) ? "flex" : "none";
+    
     const start = (currentPage - 1) * itemsPerPage;
     const paginated = history.slice(start, start + itemsPerPage);
     let lastDate = "";
@@ -240,7 +226,7 @@ function renderHistory() {
         }
         const row = document.createElement("div");
         row.className = "listItem";
-        row.innerHTML = `<button class="deleteBtn" onclick="deleteHistory(${start + i})" title="Delete entry">✕</button>
+        row.innerHTML = `<button class="deleteBtn" onclick="deleteHistory(${start + i})">✕</button>
             <div>
                 <a class="rego-link" onclick="openState('${item.state}', '${item.rego}', event)">${item.rego}</a>
                 <br><span class="date-text">${item.state} • ${item.time}</span>
@@ -248,27 +234,41 @@ function renderHistory() {
             <button class="copyBtn" onclick="copyWithToast('${item.rego}', event)">Copy</button>`;
         historyPanel.appendChild(row);
     });
-    document.getElementById("pageLabel").textContent = `Page ${currentPage}`;
+    jumpPageInput.value = currentPage;
+    jumpPageInput.max = totalPages;
     document.getElementById("prevBtn").disabled = (currentPage === 1);
-    document.getElementById("nextBtn").disabled = (start + itemsPerPage >= history.length);
+    document.getElementById("nextBtn").disabled = (currentPage === totalPages);
 }
 
 function changePage(dir) { currentPage += dir; renderHistory(); historyPanel.scrollTop = 0; }
+
+jumpPageInput.addEventListener("keydown", (e) => {
+    if(e.key === "Enter") {
+        let val = parseInt(jumpPageInput.value);
+        const max = parseInt(jumpPageInput.max);
+        if(val > 0 && val <= max) { currentPage = val; renderHistory(); }
+        else { jumpPageInput.value = currentPage; }
+    }
+});
+
 function deleteHistory(i) { 
     history.splice(i, 1); 
-    if ((currentPage - 1) * itemsPerPage >= history.length && currentPage > 1) currentPage--;
+    const totalPages = Math.ceil(history.length / itemsPerPage) || 1;
+    if (currentPage > totalPages) currentPage = totalPages;
     localStorage.setItem("regoHistory", JSON.stringify(history)); 
     renderHistory(); 
 }
 
 input.addEventListener("input", processInput);
-toggle.addEventListener("change", () => {
-    const mode = toggle.checked ? "dark" : "light";
+const themeToggle = document.getElementById("themeToggle");
+themeToggle.addEventListener("change", () => {
+    const mode = themeToggle.checked ? "dark" : "light";
     document.documentElement.setAttribute("data-theme", mode);
     localStorage.setItem("theme", mode);
 });
-
-toggle.checked = (savedTheme === "dark");
+const savedTheme = localStorage.getItem("theme") || "dark";
+document.documentElement.setAttribute("data-theme", savedTheme);
+themeToggle.checked = (savedTheme === "dark");
 initButtons();
 renderHistory();
 </script>
