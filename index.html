@@ -30,7 +30,7 @@ header h1 { margin: 0; display: inline-block; border-bottom: 5px solid var(--hea
 
 main{ display:flex; justify-content:center; padding:1.5rem; gap:1.5rem; max-width:1150px; margin:0 auto; height: calc(100vh - 80px); box-sizing: border-box; }
 #leftPanel{ flex:1; }
-#sidePanel{ width:360px; background:var(--card); border:2px solid var(--primary); border-radius:10px; height:100%; display:flex; flex-direction:column; position: relative; box-shadow: 0 4px 15px rgba(0,0,0,0.3); overflow: hidden; }
+#sidePanel{ width:380px; background:var(--card); border:2px solid var(--primary); border-radius:10px; height:100%; display:flex; flex-direction:column; position: relative; box-shadow: 0 4px 15px rgba(0,0,0,0.3); overflow: hidden; }
 
 .history-header { padding: 0.7rem; border-bottom: 2px solid var(--accent); font-weight: bold; text-align: center; background: var(--secondary-bg); color: var(--primary); font-size: 0.85rem; letter-spacing: 1px; flex-shrink: 0; }
 #historyPanel { flex:1; overflow-y: auto; padding: 0; scrollbar-width: none; -ms-overflow-style: none; }
@@ -59,14 +59,14 @@ input[type="text"]{
 .deleteBtn{ width:18px; height:18px; border-radius:50%; border:none; background:#444; color: #fff; font-size: 9px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
 .copyBtn{ background:var(--accent); color:white; border:none; padding: 5px 9px; border-radius:5px; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; cursor: pointer; }
 
-/* Daily Pagination */
-.pagination { display: none; justify-content: space-between; align-items: center; padding: 10px 15px; background: var(--secondary-bg); border-top: 2px solid var(--accent); flex-shrink: 0; }
-.pagination button { background: var(--accent); color: white; border: none; padding: 6px 14px; border-radius: 6px; font-size: 1rem; font-weight: bold; cursor: pointer; }
-.pagination button:disabled { background: #555; cursor: not-allowed; opacity: 0.5; }
-#dateDisplay { font-size: 0.75rem; font-weight: 900; color: var(--primary); text-transform: uppercase; }
+/* Timeline Pagination */
+.pagination { display: none; grid-template-columns: 1fr 1fr 1fr; align-items: center; padding: 10px 5px; background: var(--secondary-bg); border-top: 2px solid var(--accent); flex-shrink: 0; }
+.pagination button { background: var(--accent); color: white; border: none; padding: 6px 4px; border-radius: 4px; font-size: 0.65rem; font-weight: bold; cursor: pointer; text-transform: uppercase; white-space: nowrap; overflow: hidden; }
+.pagination button:disabled { background: transparent; color: transparent; cursor: default; pointer-events: none; }
+#dateDisplay { font-size: 0.7rem; font-weight: 900; color: var(--primary); text-transform: uppercase; text-align: center; }
 
 #setupOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); z-index: 2000; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; color: var(--text); padding: 20px; box-sizing: border-box; }
-#setupOverlay button { background: var(--heading-green); color: white; border: none; padding: 15px 30px; font-size: 1.2rem; font-weight: bold; border-radius: 8px; cursor: pointer; margin-top: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+#setupOverlay button { background: var(--heading-green); color: white; border: none; padding: 20px 40px; font-size: 1.5rem; font-weight: bold; border-radius: 12px; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.4); }
 
 #toast { position: fixed; background: #333; color: #fff; padding: 5px 10px; border-radius: 5px; font-size: 0.75rem; font-weight: bold; opacity: 0; transition: opacity 0.2s; pointer-events: none; z-index: 1000; border: 1px solid var(--accent); }
 #toast.show { opacity: 1; }
@@ -82,8 +82,7 @@ input:checked + .slider:before{ transform:translateX(16px); }
 <body>
 
 <div id="setupOverlay" style="display:none;">
-    <h1>RapidRego Ready</h1>
-    <p>To enable <b>Auto-Copy</b> and avoid browser popups,<br>click the button below to grant permission.</p>
+    <p style="margin-bottom: 25px;">To enable <b>Auto-Copy</b> and search shortcuts,<br>please click below to allow browser permissions.</p>
     <button onclick="dismissSetup()">ALLOW & START</button>
 </div>
 
@@ -104,9 +103,9 @@ input:checked + .slider:before{ transform:translateX(16px); }
         <div class="history-header">HISTORY</div>
         <div id="historyPanel"></div>
         <div class="pagination" id="paginationBar">
-            <button id="prevDateBtn" onclick="changeDate(1)" title="Older History">&#8592;</button>
+            <button id="newerBtn" onclick="changeDate(-1)">Newer</button>
             <div id="dateDisplay">Date</div>
-            <button id="nextDateBtn" onclick="changeDate(-1)" title="Newer History">&#8594;</button>
+            <button id="olderBtn" onclick="changeDate(1)">Older</button>
         </div>
     </div>
 </main>
@@ -125,19 +124,27 @@ const paginationBar = document.getElementById("paginationBar");
 const dateDisplay = document.getElementById("dateDisplay");
 
 let history = JSON.parse(localStorage.getItem("regoHistory") || "[]");
-let dateIndex = 0; // 0 = Most recent date, 1 = Previous date, etc.
+let dateIndex = 0;
 
-// 1. Permission Handler
+// 1. Permission Handler (The Chrome/Edge Silver Bullet)
 if (!localStorage.getItem("setupDone")) {
     document.getElementById("setupOverlay").style.display = "flex";
 }
 async function dismissSetup() {
+    // Attempting to read/write explicitly via Permissions API usually forces the browser prompt
     try {
-        await navigator.clipboard.writeText("READY"); // Real write triggers browser permission
+        const queryOpts = { name: 'clipboard-write', allowWithoutGesture: false };
+        await navigator.permissions.query(queryOpts);
+        await navigator.clipboard.writeText("REGO_READY");
         localStorage.setItem("setupDone", "true");
         document.getElementById("setupOverlay").style.display = "none";
         input.focus();
-    } catch (err) { alert("Please allow clipboard access when the browser asks."); }
+    } catch (err) {
+        // Fallback for older browsers
+        localStorage.setItem("setupDone", "true");
+        document.getElementById("setupOverlay").style.display = "none";
+        input.focus();
+    }
 }
 
 // 2. Global Key Listener
@@ -184,18 +191,23 @@ function processInput() {
     }
 }
 
+function getTodayString() {
+    const d = new Date();
+    return `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
+}
+
 function openState(state, rego, event) {
     window.open(stateLinks[state], '_blank');
     if (rego && rego.length > 1) {
         copyWithToast(rego, event);
         const d = new Date();
-        const dateKey = `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
+        const dateKey = getTodayString();
         const timeStr = `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
         
         if(history.length === 0 || history[0].rego !== rego.toUpperCase() || history[0].state !== state) {
             history.unshift({ rego: rego.toUpperCase(), state, time: timeStr, date: dateKey });
             localStorage.setItem("regoHistory", JSON.stringify(history));
-            dateIndex = 0; // Reset to "Today" view on new search
+            dateIndex = 0; 
             renderHistory();
         }
         input.value = "";
@@ -205,19 +217,37 @@ function openState(state, rego, event) {
 function renderHistory() {
     historyPanel.innerHTML = "";
     if (history.length === 0) { paginationBar.style.display = "none"; return; }
-    paginationBar.style.display = "flex";
+    paginationBar.style.display = "grid";
 
-    // Get unique dates in order
     const uniqueDates = [...new Set(history.map(item => item.date))];
     if (dateIndex >= uniqueDates.length) dateIndex = uniqueDates.length - 1;
     if (dateIndex < 0) dateIndex = 0;
 
     const targetDate = uniqueDates[dateIndex];
-    dateDisplay.textContent = targetDate;
+    const today = getTodayString();
+    dateDisplay.textContent = (targetDate === today) ? "TODAY" : targetDate;
+
+    // Button Labels
+    const olderBtn = document.getElementById("olderBtn");
+    const newerBtn = document.getElementById("newerBtn");
+
+    if (dateIndex < uniqueDates.length - 1) {
+        olderBtn.disabled = false;
+        olderBtn.textContent = `To ${uniqueDates[dateIndex+1]}`;
+    } else {
+        olderBtn.disabled = true;
+    }
+
+    if (dateIndex > 0) {
+        newerBtn.disabled = false;
+        const nextLabel = uniqueDates[dateIndex-1];
+        newerBtn.textContent = (nextLabel === today) ? "To Today" : `To ${nextLabel}`;
+    } else {
+        newerBtn.disabled = true;
+    }
 
     const entriesForDate = history.filter(item => item.date === targetDate);
     entriesForDate.forEach((item) => {
-        // Find original index for deletion
         const originalIndex = history.findIndex(h => h === item);
         const row = document.createElement("div");
         row.className = "listItem";
@@ -229,9 +259,6 @@ function renderHistory() {
             <button class="copyBtn" onclick="copyWithToast('${item.rego}', event)">Copy</button>`;
         historyPanel.appendChild(row);
     });
-
-    document.getElementById("prevDateBtn").disabled = (dateIndex >= uniqueDates.length - 1);
-    document.getElementById("nextDateBtn").disabled = (dateIndex === 0);
 }
 
 function changeDate(dir) { dateIndex += dir; renderHistory(); historyPanel.scrollTop = 0; }
