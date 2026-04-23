@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -25,76 +26,123 @@
     --disabled: #ccc;
 }
 
-body{ margin:0; padding:0; background:var(--bg); color:var(--text); font-family:sans-serif; overflow-x: hidden; }
-header{ background:var(--header-bg); color:var(--header-text); padding:1rem; text-align:center; position:relative; border-bottom: 1px solid var(--border); }
-header h1 { margin: 0; display: inline-block; border-bottom: 5px solid var(--heading-green); padding-bottom: 4px; font-size: 1.4rem; text-transform: uppercase; letter-spacing: 1px; }
+body{ margin:0; padding:0; background:var(–bg); color:var(–text); font-family:sans-serif; overflow-x: hidden; }
+header{ background:var(–header-bg); color:var(–header-text); padding:1rem; text-align:center; position:relative; border-bottom: 1px solid var(–border); }
+header h1 { margin: 0; display: inline-block; border-bottom: 5px solid var(–heading-green); padding-bottom: 4px; font-size: 1.4rem; text-transform: uppercase; letter-spacing: 1px; }
 
 main{ display:flex; justify-content:center; padding:1.5rem; gap:1.5rem; max-width:1150px; margin:0 auto; height: calc(100vh - 80px); box-sizing: border-box; }
 #leftPanel{ flex:1; min-width: 300px; }
-#sidePanel{ width:360px; background:var(--card); border:2px solid var(--primary); border-radius:10px; height:100%; display:flex; flex-direction:column; position: relative; box-shadow: 0 4px 15px rgba(0,0,0,0.3); overflow: hidden; }
+#sidePanel{ width:360px; background:var(–card); border:2px solid var(–primary); border-radius:10px; height:100%; display:flex; flex-direction:column; position: relative; box-shadow: 0 4px 15px rgba(0,0,0,0.3); overflow: hidden; }
 
 button, li, .rego-link, .deleteBtn { transition: all 0.1s ease; cursor: pointer; }
 button:active, li:active { transform: scale(0.94); }
 
 #regoInput{
-    width:100%; padding:0.9rem; font-size:1.2rem; border:3px solid var(--primary); 
-    border-radius:10px; background:var(--card); color:var(--text); font-weight:bold; text-transform:uppercase; box-sizing: border-box; outline: none;
+width:100%; padding:0.9rem; font-size:1.2rem; border:3px solid var(–primary);
+border-radius:10px; background:var(–card); color:var(–text); font-weight:bold; text-transform:uppercase; box-sizing: border-box; outline: none;
 }
+
+/* History search input */
+#historySearch {
+width: 100%;
+padding: 0.55rem 0.75rem;
+font-size: 0.85rem;
+border: none;
+border-bottom: 2px solid var(–border);
+background: var(–secondary-bg);
+color: var(–text);
+box-sizing: border-box;
+outline: none;
+font-family: sans-serif;
+flex-shrink: 0;
+}
+#historySearch::placeholder { color: #888; }
+#historySearch:focus { border-bottom-color: var(–accent); }
 
 #stateGrid{ display:grid; grid-template-columns: repeat(3, 1fr); gap:0.5rem; padding:0; list-style:none; margin-top:1rem; }
-#stateGrid li{ 
-    background:var(--secondary-bg); color:var(--primary); font-weight:800; 
-    padding:0.8rem 0.4rem; border-radius:8px; text-align:center; 
-    font-size: 0.95rem; border: 1px solid var(--border);
-    display: flex; align-items: center; justify-content: center; min-height: 40px;
+#stateGrid li{
+background:var(–secondary-bg); color:var(–primary); font-weight:800;
+padding:0.8rem 0.4rem; border-radius:8px; text-align:center;
+font-size: 0.95rem; border: 1px solid var(–border);
+display: flex; align-items: center; justify-content: center; min-height: 40px;
 }
-#stateGrid li:hover{ background:var(--accent); color:white; }
+#stateGrid li:hover{ background:var(–accent); color:white; }
 
-.history-header { padding: 0.7rem; border-bottom: 2px solid var(--accent); font-weight: bold; text-align: center; background: var(--secondary-bg); color: var(--primary); font-size: 0.85rem; letter-spacing: 1px; flex-shrink: 0; }
+.history-header { padding: 0.7rem; border-bottom: 2px solid var(–accent); font-weight: bold; text-align: center; background: var(–secondary-bg); color: var(–primary); font-size: 0.85rem; letter-spacing: 1px; flex-shrink: 0; }
 #historyPanel { flex:1; overflow-y: auto; padding: 0; scrollbar-width: none; }
 #historyPanel::-webkit-scrollbar { display: none; }
 
-.listItem{ display:grid; grid-template-columns: 24px 1fr auto; align-items:center; background:var(--secondary-bg); padding: 0.6rem 0.8rem; gap:8px; border-left: 4px solid var(--accent); border-bottom: 1px solid var(--border); }
-.rego-link { font-size: 0.95rem; font-weight: 800; color: var(--primary); text-transform: uppercase; text-decoration: none; display: inline-block; }
-.rego-link:hover { color: var(--accent); }
+/* Empty state */
+#emptyState {
+display: none;
+flex-direction: column;
+align-items: center;
+justify-content: center;
+height: 100%;
+padding: 2rem;
+text-align: center;
+color: #888;
+gap: 0.75rem;
+}
+#emptyState svg { opacity: 0.3; }
+#emptyState p { margin: 0; font-size: 0.85rem; font-weight: 600; line-height: 1.5; }
+
+.listItem{ display:grid; grid-template-columns: 24px 1fr auto; align-items:center; background:var(–secondary-bg); padding: 0.6rem 0.8rem; gap:8px; border-left: 4px solid var(–accent); border-bottom: 1px solid var(–border); }
+.rego-link { font-size: 0.95rem; font-weight: 800; color: var(–primary); text-transform: uppercase; text-decoration: none; display: inline-block; }
+.rego-link:hover { color: var(–accent); }
+
+/* Highlight matched text in fuzzy search */
+.rego-link mark { background: var(–accent); color: white; border-radius: 2px; padding: 0 1px; font-style: normal; }
+
 .date-text { font-size: 0.65rem; color: #aaa; font-weight: 600; pointer-events: none; }
 
 .deleteBtn{ width:22px; height:22px; border-radius:50%; border:none; background:#444; color: #fff; font-size: 10px; display: flex; align-items: center; justify-content: center; }
-.deleteBtn:hover { background: var(--danger); color: white; }
+.deleteBtn:hover { background: var(–danger); color: white; }
 
-.copyBtn{ background:var(--accent); color:white; border:none; padding: 6px 10px; border-radius:5px; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; }
+.copyBtn{ background:var(–accent); color:white; border:none; padding: 6px 10px; border-radius:5px; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; }
 
-.pagination { display: none; justify-content: space-between; align-items: center; padding: 10px 15px; background: var(--secondary-bg); border-top: 2px solid var(--accent); flex-shrink: 0; }
-.pagination button { background: var(--accent); color: white; border: none; width: 45px; height: 35px; border-radius: 6px; font-size: 1.3rem; font-weight: bold; position: relative; }
-.pagination button:disabled { background: var(--disabled); color: #888; cursor: not-allowed; transform: none; filter: grayscale(1); }
+.pagination { display: none; justify-content: space-between; align-items: center; padding: 10px 15px; background: var(–secondary-bg); border-top: 2px solid var(–accent); flex-shrink: 0; }
+.pagination button { background: var(–accent); color: white; border: none; width: 45px; height: 35px; border-radius: 6px; font-size: 1.3rem; font-weight: bold; position: relative; }
+.pagination button:disabled { background: var(–disabled); color: #888; cursor: not-allowed; transform: none; filter: grayscale(1); }
 
-.nav-tip { position: absolute; bottom: 50px; background: #333; color: white; padding: 5px 10px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; white-space: nowrap; pointer-events: none; opacity: 0; transition: opacity 0.2s; border: 1px solid var(--accent); z-index: 10; }
+.nav-tip { position: absolute; bottom: 50px; background: #333; color: white; padding: 5px 10px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; white-space: nowrap; pointer-events: none; opacity: 0; transition: opacity 0.2s; border: 1px solid var(–accent); z-index: 10; }
 .pagination button:not(:disabled):hover .nav-tip { opacity: 1; }
 #newerTip { left: 0; }
 #olderTip { right: 0; }
 
-#dateDisplay { font-size: 0.75rem; font-weight: 900; color: var(--primary); text-transform: uppercase; }
+#dateDisplay { font-size: 0.75rem; font-weight: 900; color: var(–primary); text-transform: uppercase; }
 
-#setupOverlay { position: fixed; inset: 0; background: var(--bg); z-index: 2000; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; }
-#setupOverlay button { background: var(--heading-green); color: white; border: none; padding: 25px 60px; font-size: 1.5rem; font-weight: 900; border-radius: 15px; }
+#setupOverlay { position: fixed; inset: 0; background: var(–bg); z-index: 2000; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; }
+#setupOverlay button { background: var(–heading-green); color: white; border: none; padding: 25px 60px; font-size: 1.5rem; font-weight: 900; border-radius: 15px; }
 
-#toast { position: fixed; background: #333; color: #fff; padding: 5px 10px; border-radius: 5px; font-size: 0.75rem; font-weight: bold; opacity: 0; transition: 0.2s; pointer-events: none; z-index: 1000; border: 1px solid var(--accent); }
+#toast { position: fixed; background: #333; color: #fff; padding: 5px 10px; border-radius: 5px; font-size: 0.75rem; font-weight: bold; opacity: 0; transition: 0.2s; pointer-events: none; z-index: 1000; border: 1px solid var(–accent); }
 #toast.show { opacity: 1; }
 
 .theme-toggle-container{ position:absolute; right:15px; top:18px; }
 .toggle-switch{ position:relative; display:inline-block; width:34px; height:18px; }
 .toggle-switch input{ opacity:0; width:0; height:0; }
 .slider{ position:absolute; cursor:pointer; top:0; left:0; right:0; bottom:0; background:#ccc; transition:.4s; border-radius:34px; }
-.slider:before{ position:absolute; content:""; height:12px; width:12px; left:3px; bottom:3px; background:white; transition:.4s; border-radius:50%; }
-input:checked + .slider{ background:var(--accent); }
+.slider:before{ position:absolute; content:””; height:12px; width:12px; left:3px; bottom:3px; background:white; transition:.4s; border-radius:50%; }
+input:checked + .slider{ background:var(–accent); }
 input:checked + .slider:before{ transform:translateX(16px); }
 
+/* No search results message */
+#noSearchResults {
+display: none;
+padding: 1.5rem;
+text-align: center;
+color: #888;
+font-size: 0.85rem;
+font-weight: 600;
+}
+
 @media (max-width: 800px) {
-    main { flex-direction: column; height: auto; overflow-y: visible; }
-    #sidePanel { width: 100%; height: 500px; margin-top: 1rem; }
-    .nav-tip { display: none; }
+main { flex-direction: column; height: auto; overflow-y: visible; }
+#sidePanel { width: 100%; height: 500px; margin-top: 1rem; }
+.nav-tip { display: none; }
 }
 </style>
+
 </head>
 <body>
 
@@ -116,25 +164,41 @@ input:checked + .slider:before{ transform:translateX(16px); }
         <ul id="stateGrid"></ul>
     </div>
 
-    <div id="sidePanel">
-        <div class="history-header">HISTORY</div>
-        <div id="historyPanel"></div>
-        <div class="pagination" id="paginationBar">
-            <button id="newerBtn" onclick="changeDate(-1)">
-                &#8592; <span id="newerTip" class="nav-tip"></span>
-            </button>
-            <div id="dateDisplay">Date</div>
-            <button id="olderBtn" onclick="changeDate(1)">
-                &#8594; <span id="olderTip" class="nav-tip"></span>
-            </button>
+```
+<div id="sidePanel">
+    <div class="history-header">HISTORY</div>
+    <input id="historySearch" type="text" placeholder="Filter history..." autocomplete="off">
+    <div id="historyPanel">
+        <div id="emptyState">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.22.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM5 11l1.5-4.5h11L19 11H5z"/>
+            </svg>
+            <p>No searches yet.<br>Enter a rego above and<br>select a state to get started.</p>
         </div>
+        <div id="noSearchResults">No history matches your search.</div>
     </div>
+    <div class="pagination" id="paginationBar">
+        <button id="newerBtn" onclick="changeDate(-1)">
+            &#8592; <span id="newerTip" class="nav-tip"></span>
+        </button>
+        <div id="dateDisplay">Date</div>
+        <button id="olderBtn" onclick="changeDate(1)">
+            &#8594; <span id="olderTip" class="nav-tip"></span>
+        </button>
+    </div>
+</div>
+```
+
 </main>
 
 <div id="toast">Copied</div>
 
 <script>
+// State links — full URLs for each jurisdiction's rego check page
 const stateLinks = { VIC: "https://www.vicroads.vic.gov.au/registration/buy-sell-or-transfer-a-vehicle/check-vehicle-registration/vehicle-registration-enquiry", NSW: "https://check-registration.service.nsw.gov.au/?isLoginRequired=true", QLD: "https://www.service.transport.qld.gov.au/checkrego/application/VehicleSearch.xhtml", SA: "https://account.ezyreg.sa.gov.au/account/check-registration.htm", WA: "https://online.transport.wa.gov.au/webExternal/registration/", TAS: "https://www.transport.tas.gov.au/MRSWebInterface/public/regoLookup/registrationLookup.xhtml", ACT: "https://rego.act.gov.au/regosoawicket/public/reg/FindRegistrationPage", NT: "https://nt.gov.au/driving/rego/existing-nt-registration/rego-check", NHVR: "https://www.service.nhvr.gov.au/#page=informationHub/nHVASAVMSearch" };
+
+// Single-letter shorthand for fast keyboard entry — e.g. "ABC123 V" opens VIC
+// V=VIC, N=NSW, Q=QLD, S=SA, W=WA, T=TAS, A=ACT, D=NT, H=NHVR
 const shorthand = { 'V': 'VIC', 'N': 'NSW', 'Q': 'QLD', 'S': 'SA', 'W': 'WA', 'T': 'TAS', 'A': 'ACT', 'D': 'NT', 'H': 'NHVR' };
 
 const input = document.getElementById("regoInput");
@@ -143,12 +207,35 @@ const stateGrid = document.getElementById("stateGrid");
 const toast = document.getElementById("toast");
 const paginationBar = document.getElementById("paginationBar");
 const dateDisplay = document.getElementById("dateDisplay");
+const historySearch = document.getElementById("historySearch");
+const emptyState = document.getElementById("emptyState");
+const noSearchResults = document.getElementById("noSearchResults");
 
 let history = JSON.parse(localStorage.getItem("regoHistory") || "[]");
 let dateIndex = 0;
+let historyFilterQuery = "";
 
-// Optimized Keydown Listener
+// --- Auto-delete entries older than 3 months on load ---
+function pruneOldHistory() {
+    const now = new Date();
+    const cutoff = new Date(now.getFullYear(), now.getMonth() - 3, now.getDate());
+    const before = history.length;
+    history = history.filter(item => {
+        // item.date is "DD/MM/YYYY"
+        const parts = item.date.split("/");
+        if (parts.length !== 3) return true; // keep if unparseable
+        const itemDate = new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
+        return itemDate >= cutoff;
+    });
+    if (history.length !== before) {
+        localStorage.setItem("regoHistory", JSON.stringify(history));
+    }
+}
+pruneOldHistory();
+
+// Optimized Keydown Listener — pressing a letter key focuses the rego input
 document.addEventListener('keydown', (e) => {
+    if (e.target === historySearch) return;
     if (e.target.tagName === 'INPUT' || e.ctrlKey || e.metaKey || e.altKey) return;
     if (e.key.length === 1 && e.key !== ' ') { 
         input.focus(); 
@@ -206,6 +293,10 @@ function processInput() {
             input.value = "";
         }
     }
+
+    // Also filter history in real time as the user types
+    historyFilterQuery = "";
+    renderHistory();
 }
 
 function getTodayString() {
@@ -224,16 +315,89 @@ function openState(state, rego, event) {
         if(history.length === 0 || history[0].rego !== rego.toUpperCase() || history[0].state !== state) {
             history.unshift({ rego: rego.toUpperCase(), state, time: timeStr, date: dateKey });
             localStorage.setItem("regoHistory", JSON.stringify(history));
-            dateIndex = 0; renderHistory();
+            dateIndex = 0; 
+            historyFilterQuery = "";
+            historySearch.value = "";
+            renderHistory();
         }
         input.value = "";
     }
 }
 
+// --- Fuzzy/partial history filter ---
+// Highlights matched characters in the rego text
+function highlightMatch(text, query) {
+    if (!query) return text;
+    const upper = text.toUpperCase();
+    const q = query.toUpperCase();
+    let result = "";
+    let qi = 0;
+    for (let i = 0; i < upper.length; i++) {
+        if (qi < q.length && upper[i] === q[qi]) {
+            result += `<mark>${text[i]}</mark>`;
+            qi++;
+        } else {
+            result += text[i];
+        }
+    }
+    return result;
+}
+
+// Returns true if all chars of query appear in order within text (fuzzy match)
+function fuzzyMatch(text, query) {
+    if (!query) return true;
+    const t = text.toUpperCase();
+    const q = query.toUpperCase();
+    let qi = 0;
+    for (let i = 0; i < t.length && qi < q.length; i++) {
+        if (t[i] === q[qi]) qi++;
+    }
+    return qi === q.length;
+}
+
 function renderHistory() {
-    historyPanel.innerHTML = "";
-    if (history.length === 0) { paginationBar.style.display = "none"; return; }
-    
+    // Clear existing list items (but not emptyState / noSearchResults divs)
+    Array.from(historyPanel.querySelectorAll(".listItem")).forEach(el => el.remove());
+
+    const query = historyFilterQuery.trim();
+    const isSearching = query.length > 0;
+
+    if (history.length === 0) {
+        emptyState.style.display = "flex";
+        noSearchResults.style.display = "none";
+        paginationBar.style.display = "none";
+        return;
+    }
+
+    emptyState.style.display = "none";
+
+    // --- Fuzzy search mode: show all matching entries across all dates ---
+    if (isSearching) {
+        paginationBar.style.display = "none";
+        const matches = history.filter(item => fuzzyMatch(item.rego, query) || fuzzyMatch(item.state, query));
+        if (matches.length === 0) {
+            noSearchResults.style.display = "block";
+        } else {
+            noSearchResults.style.display = "none";
+            matches.forEach((item) => {
+                const originalIndex = history.findIndex(h => h === item);
+                const row = document.createElement("div");
+                row.className = "listItem";
+                const highlighted = highlightMatch(item.rego, query);
+                row.innerHTML = `<button class="deleteBtn" onclick="deleteHistory(${originalIndex})">✕</button>
+                    <div>
+                        <a class="rego-link" onclick="openState('${item.state}', '${item.rego}', event)">${highlighted}</a>
+                        <br><span class="date-text">${item.state} • ${item.date} • ${item.time}</span>
+                    </div>
+                    <button class="copyBtn" onclick="copyWithToast('${item.rego}', event)">Copy</button>`;
+                historyPanel.appendChild(row);
+            });
+        }
+        return;
+    }
+
+    // --- Normal date-paginated mode ---
+    noSearchResults.style.display = "none";
     const uniqueDates = [...new Set(history.map(item => item.date))];
     if (uniqueDates.length === 0) { paginationBar.style.display = "none"; return; }
     
@@ -253,7 +417,6 @@ function renderHistory() {
     olderBtn.disabled = (dateIndex >= uniqueDates.length - 1);
     newerBtn.disabled = (dateIndex <= 0);
 
-    // Safety check for tooltips
     if(!olderBtn.disabled && uniqueDates[dateIndex+1]) {
         olderTip.textContent = `Go to ${uniqueDates[dateIndex+1]}`;
     }
@@ -287,7 +450,14 @@ function deleteHistory(i) {
     renderHistory(); 
 }
 
+// History search box listener
+historySearch.addEventListener("input", () => {
+    historyFilterQuery = historySearch.value;
+    renderHistory();
+});
+
 input.addEventListener("input", processInput);
+
 const themeToggle = document.getElementById("themeToggle");
 themeToggle.addEventListener("change", () => {
     const mode = themeToggle.checked ? "dark" : "light";
@@ -300,5 +470,6 @@ themeToggle.checked = (savedTheme === "dark");
 initButtons();
 renderHistory();
 </script>
+
 </body>
 </html>
