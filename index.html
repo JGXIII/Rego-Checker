@@ -134,8 +134,35 @@ input:checked + .slider:before{ transform:translateX(16px); }
 <div id="toast">Copied</div>
 
 <script>
-const stateLinks = { VIC: "https://www.vicroads.vic.gov.au/registration/buy-sell-or-transfer-a-vehicle/check-vehicle-registration/vehicle-registration-enquiry", NSW: "https://check-registration.service.nsw.gov.au/?isLoginRequired=true", QLD: "https://www.service.transport.qld.gov.au/checkrego/application/VehicleSearch.xhtml", SA: "https://account.ezyreg.sa.gov.au/account/check-registration.htm", WA: "https://online.transport.wa.gov.au/webExternal/registration/", TAS: "https://www.transport.tas.gov.au/MRSWebInterface/public/regoLookup/registrationLookup.xhtml", ACT: "https://rego.act.gov.au/regosoawicket/public/reg/FindRegistrationPage", NT: "https://nt.gov.au/driving/rego/existing-nt-registration/rego-check", NHVR: "https://www.service.nhvr.gov.au/#page=informationHub/nHVASAVMSearch" };
-const shorthand = { 'V': 'VIC', 'N': 'NSW', 'Q': 'QLD', 'S': 'SA', 'W': 'WA', 'T': 'TAS', 'A': 'ACT', 'D': 'NT', 'H': 'NHVR' };
+const stateLinks = { 
+    VIC: "https://www.vicroads.vic.gov.au/registration/buy-sell-or-transfer-a-vehicle/check-vehicle-registration/vehicle-registration-enquiry", 
+    NSW: "https://check-registration.service.nsw.gov.au/?isLoginRequired=true", 
+    QLD: "https://www.service.transport.qld.gov.au/checkrego/application/VehicleSearch.xhtml", 
+    SA: "https://account.ezyreg.sa.gov.au/account/check-registration.htm", 
+    WA: "https://online.transport.wa.gov.au/webExternal/registration/", 
+    TAS: "https://www.transport.tas.gov.au/MRSWebInterface/public/regoLookup/registrationLookup.xhtml", 
+    ACT: "https://rego.act.gov.au/regosoawicket/public/reg/FindRegistrationPage", 
+    NT: "https://nt.gov.au/driving/rego/existing-nt-registration/rego-check", 
+    NHVR: "https://www.service.nhvr.gov.au/#page=informationHub/nHVASAVMSearch",
+    "VIC POL": "https://www.police.vic.gov.au/stolen-vehicle-check-victoria"
+};
+
+const stateTooltips = {
+    "VIC POL": "Check if vehicle is reported stolen in Victoria"
+};
+
+const shorthand = { 
+    'V': 'VIC', 
+    'N': 'NSW', 
+    'Q': 'QLD', 
+    'S': 'SA', 
+    'W': 'WA', 
+    'T': 'TAS', 
+    'A': 'ACT', 
+    'D': 'NT', 
+    'H': 'NHVR',
+    'P': 'VIC POL'
+};
 
 const input = document.getElementById("regoInput");
 const historyPanel = document.getElementById("historyPanel");
@@ -147,7 +174,6 @@ const dateDisplay = document.getElementById("dateDisplay");
 let history = JSON.parse(localStorage.getItem("regoHistory") || "[]");
 let dateIndex = 0;
 
-// Optimized Keydown Listener
 document.addEventListener('keydown', (e) => {
     if (e.target.tagName === 'INPUT' || e.ctrlKey || e.metaKey || e.altKey) return;
     if (e.key.length === 1 && e.key !== ' ') { 
@@ -190,6 +216,9 @@ function initButtons() {
     Object.keys(stateLinks).forEach(state => {
         const li = document.createElement("li");
         li.textContent = state; 
+        if (stateTooltips[state]) {
+            li.title = stateTooltips[state];
+        }
         li.onclick = (e) => openState(state, input.value.trim().split(/\s+/).slice(0, -1).join(" ") || input.value.trim(), e);
         stateGrid.appendChild(li);
     });
@@ -253,7 +282,6 @@ function renderHistory() {
     olderBtn.disabled = (dateIndex >= uniqueDates.length - 1);
     newerBtn.disabled = (dateIndex <= 0);
 
-    // Safety check for tooltips
     if(!olderBtn.disabled && uniqueDates[dateIndex+1]) {
         olderTip.textContent = `Go to ${uniqueDates[dateIndex+1]}`;
     }
